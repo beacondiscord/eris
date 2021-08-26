@@ -20,11 +20,7 @@
   },
   "scripts": {
     "format:check": "prettier --check \"lib/**/*.js\"",
-    "format:fix": "prettier --write \"lib/**/*.js\"",
-    "lint:js": "eslint -c .eslintrc.yml lib examples *.js",
-    "lint:js:fix": "eslint -c .eslintrc.yml lib examples *.js --fix && echo \"\u001b[1m\u001b[32mOK\u001b[39m\u001b[22m\" || echo \"\u001b[1m\u001b[31mNot OK\u001b[39m\u001b[22m\"",
-    "lint:ts": "eslint -c .eslintrc.ts.yml *.ts",
-    "lint:ts:fix": "eslint -c .eslintrc.ts.yml *.ts --fix && echo \"\u001b[1m\u001b[32mOK\u001b[39m\u001b[22m\" || echo \"\u001b[1m\u001b[31mNot OK\u001b[39m\u001b[22m\""
+    "format:fix": "prettier --write \"lib/**/*.js\""
   },
   "repository": {
     "type": "git",
@@ -44,26 +40,14 @@
   },
   "homepage": "https://abal.moe/Eris/",
   "dependencies": {
+    "@tbnritzdoge/events": "^1.0.1",
+    "undici": "^3.3.6",
     "ws": "^8.2.0"
   },
   "devDependencies": {
     "@types/node": "^16.7.2",
     "@types/ws": "^7.4.7",
     "prettier": "^2.3.2",
-    "typescript": "^4.2.2"
-  },
-  "optionalDependencies": {
-    "opusscript": "^0.0.8",
-    "tweetnacl": "^1.0.1"
-  },
-  "browser": {
-    "@discordjs/opus": false,
-    "child_process": false,
-    "dgram": false,
-    "dns": false,
-    "fs": false,
-    "tls": false,
-    "tweetnacl": false,
-    "ws": false
+    "typescript": "^4.3.5"
   }
 }

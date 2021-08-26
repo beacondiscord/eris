@@ -1,26 +1,21 @@
-import Eris from "./index.js";
+import Eris from './index.js';
 
-export default function(token, options) {
+export default function (token, options) {
   return new Eris.Client(token, options);
 }
 
 export const {
   Base,
   Bucket,
-  Call,
   CategoryChannel,
   Channel,
   Client,
   Collection,
-  Command,
-  CommandClient,
   CommandInteraction,
   ComponentInteraction,
   Constants,
   DiscordHTTPError,
   DiscordRESTError,
-  ExtendedUser,
-  GroupChannel,
   Guild,
   GuildChannel,
   GuildIntegration,
@@ -37,12 +32,9 @@ export const {
   PrivateChannel,
   PrivateThreadChannel,
   PublicThreadChannel,
-  Relationship,
   RequestHandler,
   Role,
   SequentialBucket,
-  Shard,
-  SharedStream,
   StageChannel,
   StageInstance,
   StoreChannel,
@@ -54,7 +46,5 @@ export const {
   User,
   VERSION,
   VoiceChannel,
-  VoiceConnection,
-  VoiceConnectionManager,
   VoiceState
 } = Eris;
