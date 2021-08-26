@@ -16,9 +16,11 @@
   },
   "typings": "./index.d.ts",
   "engines": {
-    "node": ">=10.4.0"
+    "node": ">=16.0.0"
   },
   "scripts": {
+    "format:check": "prettier --check \"lib/**/*.js\"",
+    "format:fix": "prettier --write \"lib/**/*.js\"",
     "lint:js": "eslint -c .eslintrc.yml lib examples *.js",
     "lint:js:fix": "eslint -c .eslintrc.yml lib examples *.js --fix && echo \"\u001b[1m\u001b[32mOK\u001b[39m\u001b[22m\" || echo \"\u001b[1m\u001b[31mNot OK\u001b[39m\u001b[22m\"",
     "lint:ts": "eslint -c .eslintrc.ts.yml *.ts",
@@ -51,6 +53,7 @@
     "@typescript-eslint/parser": "^4.19.0",
     "eslint": "^7.22.0",
     "eslint-plugin-sort-class-members": "^1.10.0",
+    "prettier": "^2.3.2",
     "typescript": "^4.2.2"
   },
   "optionalDependencies": {
