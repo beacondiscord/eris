@@ -666,7 +666,7 @@ declare namespace Eris {
     voiceChannelSwitch: [member: Member, newChannel: AnyVoiceChannel, oldChannel: AnyVoiceChannel];
     voiceStateUpdate: [member: Member, oldState: OldVoiceState];
     warn: [message: string, id: number];
-    webhooksUpdate: [data: WebhookData];    
+    webhooksUpdate: [data: WebhookData];
   }
   interface ClientEvents extends EventListeners {
     shardDisconnect: [err: Error | undefined, id: number];
