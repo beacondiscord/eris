@@ -15,6 +15,7 @@ npm i DonovanDMC/eris#everything
 * [@DonovanDMC](https://github.com/DonovanDMC) [[Sticker Sending](https://github.com/abalabahaha/eris/pull/1252)]
 * [@Catboi8](https://github.com/Catboi8) [[Tweak eslint.ts](https://github.com/abalabahaha/eris/pull/1254)]
 * [@iiFDCT](https://github.com/iiFDCT) [[Ability to manage stickers, guildStickersUpdate and Guild#stickers](https://github.com/abalabahaha/eris/pull/1258)]
+* [@DonovanDMC](https://github.com/DonovanDMC) [[Several Constants Changes/Additions](https://github.com/abalabahaha/eris/pull/1271)]
 
 #### Previously Included (Merged Into Dev)
 * [@bsian03](https://github.com/bsian03) [[Expose components](https://github.com/abalabahaha/eris/pull/1189)]
