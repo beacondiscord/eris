@@ -2227,10 +2227,7 @@ declare namespace Eris {
     once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
     once(event: string, listener: (...args: any[]) => void): this;
     pinMessage(channelID: string, messageID: string): Promise<void>;
-
-
     pruneMembers(guildID: string, options?: PruneMemberOptions): Promise<number>;
-
     purgeChannel(channelID: string, options: PurgeChannelOptions): Promise<number>;
     /** @deprecated */
     purgeChannel(
@@ -3075,7 +3072,6 @@ declare namespace Eris {
     emit<K extends keyof ShardEvents>(event: K, ...args: ShardEvents[K]): boolean;
     emit(event: string, ...args: any[]): boolean;
     getGuildMembers(guildID: string, timeout: number): void;
-
     hardReset(): void;
     heartbeat(normal?: boolean): void;
     identify(): void;
@@ -3085,10 +3081,7 @@ declare namespace Eris {
     once<K extends keyof ShardEvents>(event: K, listener: (...args: ShardEvents[K]) => void): this;
     once(event: string, listener: (...args: any[]) => void): this;
     onPacket(packet: RawPacket): void;
-
-
     requestGuildMembers(guildID: string, options?: RequestGuildMembersOptions): Promise<RequestGuildMembersReturn>;
-
     requestGuildSync(guildID: string): void;
     reset(): void;
     restartGuildCreateTimeout(): void;
@@ -3139,8 +3132,6 @@ declare namespace Eris {
     setVolume(volume: number): void;
     stopPlaying(): void;
     on<K extends keyof StreamEvents>(event: K, listener: (...args: StreamEvents[K]) => void): this;
-
-
     on(event: string, listener: (...args: any[]) => void): this;
   }
 
@@ -3366,16 +3357,9 @@ declare namespace Eris {
     once<K extends keyof VoiceEvents>(event: K, listener: (...args: VoiceEvents[K]) => void): this;
     once(event: string, listener: (...args: any[]) => void): this;
     pause(): void;
-
-
-
     play(resource: ReadableStream | string, options?: VoiceResourceOptions): void;
-
-
     receive(type: "opus" | "pcm"): VoiceDataStream;
-
     registerReceiveEventHandler(): void;
-
     resume(): void;
     sendWS(op: number, data: Record<string, unknown>): void;
     setSpeaking(value: boolean): void;
