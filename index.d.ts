@@ -100,29 +100,67 @@ declare namespace Eris {
   type InteractionContent = Pick<WebhookPayload, "content" | "embeds" | "allowedMentions" | "tts" | "flags" | "components">;
   type InteractionWebhookContent = Pick<WebhookPayload, "content" | "embeds" | "file" | "allowedMentions" | "tts" | "flags" | "components">;
 
-  //Application Commands
-  interface ApplicationCommandOptions {
-    type: Constants["ApplicationCommandOptionTypes"][keyof Constants["ApplicationCommandOptionTypes"]];
+  // Application Commands
+  type ApplicationCommandOptions = ApplicationCommandOptionsSubCommand | ApplicationCommandOptionsSubCommandGroup | ApplicationCommandOptionsWithValue;
+  type ApplicationCommandOptionsWithValue = ApplicationCommandOptionsString | ApplicationCommandOptionsInteger | ApplicationCommandOptionsBoolean | ApplicationCommandOptionsUser | ApplicationCommandOptionsChannel | ApplicationCommandOptionsRole | ApplicationCommandOptionsMentionable | ApplicationCommandOptionsNumber;
+  interface ApplicationCommandOptionsSubCommand {
+    type: Constants["ApplicationCommandOptionTypes"]["SUB_COMMAND_GROUP"];
     name: string;
     description: string;
     required?: boolean;
-    choices?: { name: string; value: string | number}[];
-    options?: ApplicationCommandOptions[];
+    options: ApplicationCommandOptionsWithValue[];
+  }
+  interface ApplicationCommandOptionsSubCommandGroup {
+    type: Constants["ApplicationCommandOptionTypes"]["SUB_COMMAND_GROUP"];
+    name: string;
+    description: string;
+    required?: boolean;
+    options: (ApplicationCommandOptionsSubCommand | ApplicationCommandOptionsWithValue)[];
+  }
+  interface ApplicationCommandOptionWithChoices<T extends (Constants["ApplicationCommandOptionTypes"])[keyof Constants["ApplicationCommandOptionTypes"]]> {
+    name: string;
+    type: T;
+    description: string;
+    required?: boolean;
+    choices?: { name: string; value: T extends Constants["ApplicationCommandOptionTypes"]["STRING"] ? string : number }[];
+  }
+  interface ApplicationCommandOptionWithValue<T extends (Constants["ApplicationCommandOptionTypes"])[keyof Constants["ApplicationCommandOptionTypes"]]> {
+    type: T;
+    name: string;
+    description: string;
+    required?: boolean;
   }
 
-  interface ApplicationCommand {
+  type ApplicationCommandOptionsString = ApplicationCommandOptionWithChoices<Constants["ApplicationCommandOptionTypes"]["STRING"]>;
+  type ApplicationCommandOptionsInteger = ApplicationCommandOptionWithChoices<Constants["ApplicationCommandOptionTypes"]["INTEGER"]>;
+  type ApplicationCommandOptionsBoolean = ApplicationCommandOptionWithValue<Constants["ApplicationCommandOptionTypes"]["BOOLEAN"]>;
+  type ApplicationCommandOptionsUser = ApplicationCommandOptionWithValue<Constants["ApplicationCommandOptionTypes"]["USER"]>;
+  type ApplicationCommandOptionsChannel = ApplicationCommandOptionWithValue<Constants["ApplicationCommandOptionTypes"]["CHANNEL"]>;
+  type ApplicationCommandOptionsRole = ApplicationCommandOptionWithValue<Constants["ApplicationCommandOptionTypes"]["ROLE"]>;
+  type ApplicationCommandOptionsMentionable = ApplicationCommandOptionWithValue<Constants["ApplicationCommandOptionTypes"]["MENTIONABLE"]>;
+  type ApplicationCommandOptionsNumber = ApplicationCommandOptionWithChoices<Constants["ApplicationCommandOptionTypes"]["NUMBER"]>;
+
+  interface ApplicationCommand<T extends (Constants["ApplicationCommandTypes"])[keyof Constants["ApplicationCommandTypes"]] = (Constants["ApplicationCommandTypes"])[keyof Constants["ApplicationCommandTypes"]]> {
     id: string;
     application_id: string;
     guild_id?: string;
     name: string;
-    description?: string;
+    // I think never is the best we can do
+    description: T extends Constants["ApplicationCommandTypes"]["CHAT_INPUT"] ? string : never;
     options?: ApplicationCommandOptions[];
-    type?: Constants["ApplicationCommandTypes"][keyof Constants["ApplicationCommandTypes"]];
+    type: T;
     defaultPermission?: boolean;
   }
 
-  type ApplicationCommandStructure = Omit<ApplicationCommand, "id" | "application_id" | "guild_id">;
+  type AnyApplicationCommand = ChatInputApplicationCommand | MessageApplicationCommand | UserApplicationCommand;
+  type ChatInputApplicationCommand = ApplicationCommand<Constants["ApplicationCommandTypes"]["CHAT_INPUT"]>;
+  type MessageApplicationCommand = Omit<ApplicationCommand<Constants["ApplicationCommandTypes"]["USER"]>, "description" | "options">;
+  type UserApplicationCommand = Omit<ApplicationCommand<Constants["ApplicationCommandTypes"]["MESSAGE"]>, "description" | "options">;
 
+  type ApplicationCommandStructure = ChatInputApplicationCommandStructure | MessageApplicationCommandStructure | UserApplicationCommandStructure;
+  type ChatInputApplicationCommandStructure = Omit<ChatInputApplicationCommand, "id" | "application_id" | "guild_id">;
+  type MessageApplicationCommandStructure = Omit<MessageApplicationCommand, "id" | "application_id" | "guild_id">;
+  type UserApplicationCommandStructure = Omit<UserApplicationCommand, "id" | "application_id" | "guild_id">;
   interface ApplicationCommandPermissions {
     id: string;
     type: Constants["ApplicationCommandPermissionTypes"][keyof Constants["ApplicationCommandPermissionTypes"]];
@@ -603,8 +641,8 @@ declare namespace Eris {
     channelPinUpdate: [channel: TextableChannel, timestamp: number, oldTimestamp: number];
     channelRecipientAdd: [channel: GroupChannel, user: User];
     channelRecipientRemove: [channel: GroupChannel, user: User];
-    channelUpdate: [channel: AnyGuildChannel, oldChannel: OldGuildChannel | OldGuildTextChannel | OldGuildVoiceChannel] 
-      | [channel: GroupChannel, oldChannel: OldGroupChannel];
+    channelUpdate: [channel: AnyGuildChannel, oldChannel: OldGuildChannel | OldGuildTextChannel | OldGuildVoiceChannel]
+    | [channel: GroupChannel, oldChannel: OldGroupChannel];
     connect: [id: number];
     debug: [message: string, id: number];
     disconnect: [];
@@ -1988,6 +2026,8 @@ declare namespace Eris {
       messageID: string,
       options: MessageWebhookContent
     ): Promise<Message<GuildTextableChannel>>;
+    emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): boolean;
+    emit(event: string, ...args: any[]): boolean;
     enableSelfMFATOTP(
       secret: string,
       code: string
@@ -2108,6 +2148,10 @@ declare namespace Eris {
     leaveGuild(guildID: string): Promise<void>;
     leaveThread(channelID: string, userID?: string): Promise<void>;
     leaveVoiceChannel(channelID: string): void;
+    off<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
+    off(event: string, listener: (...args: any[]) => void): this;
+    once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
+    once(event: string, listener: (...args: any[]) => void): this;
     pinMessage(channelID: string, messageID: string): Promise<void>;
     pruneMembers(guildID: string, options?: PruneMemberOptions): Promise<number>;
     purgeChannel(channelID: string, options: PurgeChannelOptions): Promise<number>;
@@ -2135,14 +2179,8 @@ declare namespace Eris {
     unbanGuildMember(guildID: string, userID: string, reason?: string): Promise<void>;
     unpinMessage(channelID: string, messageID: string): Promise<void>;
     validateDiscoverySearchTerm(term: string): Promise<{ valid: boolean }>;
-    emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): boolean;
-    emit(event: string, ...args: any[]): boolean;
     on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
     on(event: string, listener: (...args: any[]) => void): this;
-    once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
-    once(event: string, listener: (...args: any[]) => void): this;
-    off<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
-    off(event: string, listener: (...args: any[]) => void): this;
     toString(): string;
   }
 
@@ -2539,7 +2577,7 @@ declare namespace Eris {
   }
 
   export class PingInteraction extends Interaction {
-    type: 1;
+    type: Constants["InteractionTypes"]["PING"];
     acknowledge(): Promise<void>;
     pong(): Promise<void>;
   }
@@ -2562,7 +2600,7 @@ declare namespace Eris {
     };
     guildID?: string;
     member?: Member;
-    type: 2;
+    type: Constants["InteractionTypes"]["APPLICATION_COMMAND"];
     user?: User;
     acknowledge(flags?: number): Promise<void>;
     createFollowup(content: string | InteractionWebhookContent): Promise<Message>;
@@ -2575,16 +2613,24 @@ declare namespace Eris {
     getOriginalMessage(): Promise<Message>
   }
 
+  interface ComponentInteractionButtonData {
+    component_type: Constants["ComponentTypes"]["BUTTON"];
+    custom_id: string;
+  }
+
+  interface ComponentInteractionSelectMenuData {
+    component_type: Constants["ComponentTypes"]["SELECT_MENU"];
+    custom_id: string;
+    values: string[];
+  }
+
   export class ComponentInteraction<T extends PossiblyUncachedTextable = TextableChannel> extends Interaction {
     channel: T;
-    data: {
-      component_type: Constants["ComponentTypes"][keyof Omit<Constants["ComponentTypes"], "ACTION_ROW">];
-      custom_id: string;
-      values?: string[];
-    };
+    data: ComponentInteractionButtonData | ComponentInteractionSelectMenuData;
     guildID?: string;
     member?: Member;
     message: Message;
+    type: Constants["InteractionTypes"]["MESSAGE_COMPONENT"];
     user?: User;
     acknowledge(): Promise<void>;
     createFollowup(content: string | InteractionWebhookContent): Promise<Message>;
@@ -2948,11 +2994,17 @@ declare namespace Eris {
     editStatus(activities?: ActivityPartial<BotActivityType>[] | ActivityPartial<BotActivityType>): void;
     // @ts-ignore: Method override
     emit(event: string, ...args: any[]): void;
+    emit<K extends keyof ShardEvents>(event: K, ...args: ShardEvents[K]): boolean;
+    emit(event: string, ...args: any[]): boolean;
     getGuildMembers(guildID: string, timeout: number): void;
     hardReset(): void;
     heartbeat(normal?: boolean): void;
     identify(): void;
     initializeWS(): void;
+    off<K extends keyof ShardEvents>(event: K, listener: (...args: ShardEvents[K]) => void): this;
+    off(event: string, listener: (...args: any[]) => void): this;
+    once<K extends keyof ShardEvents>(event: K, listener: (...args: ShardEvents[K]) => void): this;
+    once(event: string, listener: (...args: any[]) => void): this;
     onPacket(packet: RawPacket): void;
     requestGuildMembers(guildID: string, options?: RequestGuildMembersOptions): Promise<RequestGuildMembersReturn>;
     requestGuildSync(guildID: string): void;
@@ -2963,14 +3015,8 @@ declare namespace Eris {
     sendWS(op: number, _data: Record<string, unknown>, priority?: boolean): void;
     syncGuild(guildID: string): void;
     wsEvent(packet: Required<RawPacket>): void;
-    emit<K extends keyof ShardEvents>(event: K, ...args: ShardEvents[K]): boolean;
-    emit(event: string, ...args: any[]): boolean;
     on<K extends keyof ShardEvents>(event: K, listener: (...args: ShardEvents[K]) => void): this;
     on(event: string, listener: (...args: any[]) => void): this;
-    once<K extends keyof ShardEvents>(event: K, listener: (...args: ShardEvents[K]) => void): this;
-    once(event: string, listener: (...args: any[]) => void): this;
-    off<K extends keyof ShardEvents>(event: K, listener: (...args: ShardEvents[K]) => void): this;
-    off(event: string, listener: (...args: any[]) => void): this;
     toJSON(props?: string[]): JSONCache;
   }
 
@@ -2999,19 +3045,19 @@ declare namespace Eris {
     voiceConnections: Collection<VoiceConnection>;
     volume: number;
     add(connection: VoiceConnection): void;
+    emit<K extends keyof StreamEvents>(event: K, ...args: StreamEvents[K]): boolean;
+    emit(event: string, ...args: any[]): boolean;
+    off<K extends keyof StreamEvents>(event: K, listener: (...args: StreamEvents[K]) => void): this;
+    off(event: string, listener: (...args: any[]) => void): this;
+    once<K extends keyof StreamEvents>(event: K, listener: (...args: StreamEvents[K]) => void): this;
+    once(event: string, listener: (...args: any[]) => void): this;
     play(resource: ReadableStream | string, options?: VoiceResourceOptions): void;
     remove(connection: VoiceConnection): void;
     setSpeaking(value: boolean): void;
     setVolume(volume: number): void;
     stopPlaying(): void;
-    emit<K extends keyof StreamEvents>(event: K, ...args: StreamEvents[K]): boolean;
-    emit(event: string, ...args: any[]): boolean;
     on<K extends keyof StreamEvents>(event: K, listener: (...args: StreamEvents[K]) => void): this;
     on(event: string, listener: (...args: any[]) => void): this;
-    once<K extends keyof StreamEvents>(event: K, listener: (...args: StreamEvents[K]) => void): this;
-    once(event: string, listener: (...args: any[]) => void): this;
-    off<K extends keyof StreamEvents>(event: K, listener: (...args: StreamEvents[K]) => void): this;
-    off(event: string, listener: (...args: any[]) => void): this;
   }
 
   export class StageChannel extends VoiceChannel {
@@ -3227,7 +3273,13 @@ declare namespace Eris {
     constructor(id: string, options?: { shard?: Shard; shared?: boolean; opusOnly?: boolean });
     connect(data: VoiceConnectData): NodeJS.Timer | void;
     disconnect(error?: Error, reconnecting?: boolean): void;
+    emit<K extends keyof VoiceEvents>(event: K, ...args: VoiceEvents[K]): boolean;
+    emit(event: string, ...args: any[]): boolean;
     heartbeat(): void;
+    off<K extends keyof VoiceEvents>(event: K, listener: (...args: VoiceEvents[K]) => void): this;
+    off(event: string, listener: (...args: any[]) => void): this;
+    once<K extends keyof VoiceEvents>(event: K, listener: (...args: VoiceEvents[K]) => void): this;
+    once(event: string, listener: (...args: any[]) => void): this;
     pause(): void;
     play(resource: ReadableStream | string, options?: VoiceResourceOptions): void;
     receive(type: "opus" | "pcm"): VoiceDataStream;
@@ -3239,14 +3291,8 @@ declare namespace Eris {
     stopPlaying(): void;
     switchChannel(channelID: string): void;
     updateVoiceState(selfMute: boolean, selfDeaf: boolean): void;
-    emit<K extends keyof VoiceEvents>(event: K, ...args: VoiceEvents[K]): boolean;
-    emit(event: string, ...args: any[]): boolean;
     on<K extends keyof VoiceEvents>(event: K, listener: (...args: VoiceEvents[K]) => void): this;
     on(event: string, listener: (...args: any[]) => void): this;
-    once<K extends keyof VoiceEvents>(event: K, listener: (...args: VoiceEvents[K]) => void): this;
-    once(event: string, listener: (...args: any[]) => void): this;
-    off<K extends keyof VoiceEvents>(event: K, listener: (...args: VoiceEvents[K]) => void): this;
-    off(event: string, listener: (...args: any[]) => void): this;
     toJSON(props?: string[]): JSONCache;
   }
 
