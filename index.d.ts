@@ -2699,7 +2699,7 @@ declare namespace Eris {
   export class ComponentInteraction<T extends PossiblyUncachedTextable = TextableChannel> extends Interaction {
     channel: T;
     data: {
-      component_type: 2 | 3;
+      component_type: Constants["ComponentTypes"][keyof Omit<Constants["ComponentTypes"], "ACTION_ROW">];
       custom_id: string;
       values?: string[];
     };
