@@ -530,6 +530,7 @@ declare namespace Eris {
     name: string;
     ownerID: string;
     icon: string;
+    type: Constants["ChannelTypes"]["GROUP_DM"];
   }
   interface OldGuild {
     afkChannelID: string | null;
@@ -573,18 +574,18 @@ declare namespace Eris {
     rateLimitPerUser?: number;
     rtcRegion?: string | null;
     topic?: string | null;
-    type: Exclude<ChannelTypes, 1 | 3>;
+    type: GuildChannelTypes;
   }
   interface OldGuildTextChannel extends OldGuildChannel {
     nsfw: boolean;
     rateLimitPerUser: number;
     topic: string | null;
-    type: 0 | 5;
+    type: GuildTextChannelTypes;
   }
   interface OldGuildVoiceChannel extends OldGuildChannel {
     bitrate: number;
     rtcRegion: string | null;
-    type: 2 | 13;
+    type: GuildVoiceChannelTypes;
     userLimit: number;
     videoQualityMode: VideoQualityMode;
   }
@@ -1726,10 +1727,10 @@ declare namespace Eris {
       COMPETING: 5;
     };
     ButtonType: {
-      PRIMARY_CTA: 1;
-      PRIMARY_SUCCESS: 2;
-      SECONDARY: 3;
-      DESTRUCTIVE: 4;
+      PRIMARY: 1;
+      SECONDARY: 2;
+      SUCCESS: 3;
+      DANGER: 4;
       LINK: 5;
     };
     PremiumType: {
