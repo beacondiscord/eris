@@ -51,6 +51,7 @@ export const {
   ThreadChannel,
   ThreadMember,
   UnavailableGuild,
+  UnknownInteraction,
   User,
   VERSION,
   VoiceChannel,
