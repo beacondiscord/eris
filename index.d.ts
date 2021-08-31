@@ -59,6 +59,7 @@ declare namespace Eris {
   type PossiblyUncachedGuild = Guild | Uncached;
   type PremiumTier = (Constants["PremiumTier"])[keyof Constants["PremiumTier"]];
   type VerificationLevel = (Constants["VerificationLevel"])[keyof Constants["VerificationLevel"]];
+  type SystemChannelFlags = (Constants["SystemChannelFlags"])[keyof Constants["SystemChannelFlags"]];
 
   // Message
   type ActionRowComponents = Button | SelectMenu;
@@ -559,7 +560,7 @@ declare namespace Eris {
     rulesChannelID: string | null;
     splash: string | null;
     stickers?: Sticker[];
-    systemChannelFlags: number;
+    systemChannelFlags: SystemChannelFlags;
     systemChannelID: string | null;
     vanityURL: string | null;
     verificationLevel: VerificationLevel;
@@ -856,7 +857,7 @@ declare namespace Eris {
     publicUpdatesChannelID?: string;
     rulesChannelID?: string;
     splash?: string;
-    systemChannelFlags?: number;
+    systemChannelFlags?: SystemChannelFlags;
     systemChannelID?: string;
     verificationLevel?: VerificationLevel;
   }
@@ -2470,7 +2471,7 @@ declare namespace Eris {
     splashURL: string | null;
     stageInstances: Collection<StageInstance>;
     stickers?: Sticker[];
-    systemChannelFlags: number;
+    systemChannelFlags: SystemChannelFlags;
     systemChannelID: string | null;
     threads: Collection<ThreadChannel>;
     unavailable: boolean;
