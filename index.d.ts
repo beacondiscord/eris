@@ -1219,6 +1219,12 @@ declare namespace Eris {
   }
 
   // Voice
+  interface JoinVoiceChannelOptions {
+    opusOnly?: boolean;
+    selfDeaf?: boolean;
+    selfMute?: boolean;
+    shared?: boolean;
+  }
   interface StageInstanceOptions {
     privacyLevel?: StageInstancePrivacyLevel;
     topic?: string;
