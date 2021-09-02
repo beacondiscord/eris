@@ -999,6 +999,7 @@ declare namespace Eris {
   }
   interface AdvancedMessageContent {
     allowedMentions?: AllowedMentions;
+    components?: ActionRow[];
     content?: string;
     /** @deprecated */
     embed?: EmbedOptions;
@@ -1007,6 +1008,7 @@ declare namespace Eris {
     messageReference?: MessageReferenceReply;
     /** @deprecated */
     messageReferenceID?: string;
+    stickerIDs?: string[];
     tts?: boolean;
   }
   interface AdvancedMessageContentEdit extends AdvancedMessageContent {
@@ -1169,7 +1171,7 @@ declare namespace Eris {
   interface PartialRole {
     color?: number;
     hoist?: boolean;
-    id?: string;
+    id: string;
     mentionable?: boolean;
     name?: string;
     permissions?: number;
