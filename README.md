@@ -11,7 +11,7 @@ npm i DonovanDMC/eris#v9-interactions
 ```
 
 #### Included Pull Requests:
-* [@catboi8](https://github.com/Catboi8) [[Support Interactions](https://github.com/abalabahaha/eris/pull/1210)]
+* [@Catboi8](https://github.com/Catboi8) [[Support Interactions](https://github.com/abalabahaha/eris/pull/1210)]
 * [@bsian03](https://github.com/bsian03) [[Discord API V9](https://github.com/abalabahaha/eris/pull/1216)]
 
 #### Table of Contents
