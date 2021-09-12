@@ -2,7 +2,8 @@
 
 Do not forward errors you encounter to me, unless you believe they were caused during merging. Point them to the pull request author, or main eris repository if you cannot figure out where they came from. We would all be happy to help in #support of the [Eris Discord Server](https://discord.gg/eris)
 
-You can find some unofficial documentation [here](https://eris.owo-whats-this.dev/everything).
+#### Documentation
+You can find some documentation [here](https://eris.owo-whats-this.dev/everything).
 
 #### To Install:
 ```
