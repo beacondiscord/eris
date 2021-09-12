@@ -11,14 +11,14 @@ npm i DonovanDMC/eris#everything
 ```
 
 #### Included Pull Requests:
-- [@cATBOI8](https://github.com/Catboi8) [[Support Interactions](https://github.com/abalabahaha/eris/pull/1210)]
+- [@Catboi8](https://github.com/Catboi8) [[Support Interactions](https://github.com/abalabahaha/eris/pull/1210)]
 - [@bsian03](https://github.com/bsian03) [[Discord API V9](https://github.com/abalabahaha/eris/pull/1216)]
 - [@LJNeon](https://github.com/LJNeon) [[Standardized parsing errors](https://github.com/abalabahaha/eris/pull/1227)]
 - [@iiFDCT](https://github.com/iiFDCT) [[Add support for user banners](https://github.com/abalabahaha/eris/pull/1238)]
-- [@cATBOI8](https://github.com/Catboi8) [[Tweak eslint.ts](https://github.com/abalabahaha/eris/pull/1254)]
+- [@Catboi8](https://github.com/Catboi8) [[Tweak eslint.ts](https://github.com/abalabahaha/eris/pull/1254)]
 - [@iiFDCT](https://github.com/iiFDCT) [[Ability to manage stickers, guildStickersUpdate and Guild#stickers](https://github.com/abalabahaha/eris/pull/1258)]
 - [@DonovanDMC](https://github.com/DonovanDMC) [[Several Constants Changes/Additions](https://github.com/abalabahaha/eris/pull/1271)]
-- [@cATBOI8](https://github.com/Catboi8) [[File Changes](https://github.com/abalabahaha/eris/pull/1273)]
+- [@Catboi8](https://github.com/Catboi8) [[File Changes](https://github.com/abalabahaha/eris/pull/1273)]
 
 #### Previously Included (Merged Into Dev)
 - [@bsian03](https://github.com/bsian03) [[Expose components](https://github.com/abalabahaha/eris/pull/1189)]
