@@ -5,13 +5,11 @@ Do not forward errors you encounter to me, unless you believe they were caused d
 You can find some unofficial documentation [here](https://eris.owo-whats-this.dev/everything).
 
 #### To Install:
-
 ```
 npm i DonovanDMC/eris#everything
 ```
 
 #### Included Pull Requests:
-
 - [@catboi8](https://github.com/Catboi8) [[Support Interactions](https://github.com/abalabahaha/eris/pull/1210)]
 - [@bsian03](https://github.com/bsian03) [[Discord API V9](https://github.com/abalabahaha/eris/pull/1216)]
 - [@LJNeon](https://github.com/LJNeon) [[Standardized parsing errors](https://github.com/abalabahaha/eris/pull/1227)]
@@ -22,7 +20,6 @@ npm i DonovanDMC/eris#everything
 - [@Catboi8](https://github.com/Catboi8) [[File Changes](https://github.com/abalabahaha/eris/pull/1273)]
 
 #### Previously Included (Merged Into Dev)
-
 - [@bsian03](https://github.com/bsian03) [[Expose components](https://github.com/abalabahaha/eris/pull/1189)]
 - [@bsian03](https://github.com/bsian03) [[Type guild features as actual values](https://github.com/abalabahaha/eris/pull/1212)]
 - [@bsian03](https://github.com/bsian03) [[Expose audit log events 83-85](https://github.com/abalabahaha/eris/pull/1213)]
@@ -34,7 +31,6 @@ npm i DonovanDMC/eris#everything
 - [@bsian03](https://github.com/bsian03) [[Warn when invalid intent is supplied](https://github.com/abalabahaha/eris/pull/1261)]
 
 #### Table of Contents
-
 (striked branches are obsolete, and may no longer exist)
 
 - **everything**
