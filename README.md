@@ -31,10 +31,5 @@ npm i DonovanDMC/eris#everything
 - [@bsian03](https://github.com/bsian03) [[Warn when invalid intent is supplied](https://github.com/abalabahaha/eris/pull/1261)]
 
 #### Table of Contents
-(striked branches are obsolete, and may no longer exist)
-
 - **everything**
 - [v9-interactions](https://github.com/DonovanDMC/eris/tree/v9-interactions)
-- ~~v9-components~~
-- ~~components-interactions~~
-- ~~v9-components-interactions~~
