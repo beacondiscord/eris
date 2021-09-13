@@ -15,9 +15,5 @@ npm i DonovanDMC/eris#v9-interactions
 * [@bsian03](https://github.com/bsian03) [[Discord API V9](https://github.com/abalabahaha/eris/pull/1216)]
 
 #### Table of Contents
-(striked branches are obsolete, and may no longer exist)
 * [everything](https://github.com/DonovanDMC/eris/tree/everything)
 * **v9-interactions**
-* ~~v9-components~~
-* ~~components-interactions~~
-* ~~v9-components-interactions~~
