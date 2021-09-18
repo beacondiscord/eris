@@ -1022,6 +1022,7 @@ declare namespace Eris {
   }
   interface Attachment {
     content_type?: string;
+    ephemeral?: boolean;
     filename: string;
     height?: number;
     id: string;
