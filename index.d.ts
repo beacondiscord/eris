@@ -2657,7 +2657,7 @@ declare namespace Eris {
     deleteOriginalMessage(): Promise<void>;
     editMessage(messageID: string, content: string | MessageWebhookContent): Promise<Message>;
     editOriginalMessage(content: string | MessageWebhookContent): Promise<Message>;
-    editParent(content: MessageWebhookContent): Promise<Message>;
+    editParent(content: MessageWebhookContent): Promise<void>;
     getOriginalMessage(): Promise<Message>
   }
 
@@ -2677,7 +2677,7 @@ declare namespace Eris {
     deleteOriginalMessage(): Promise<void>;
     editMessage(messageID: string, content: string | MessageWebhookContent): Promise<Message>;
     editOriginalMessage(content: string | MessageWebhookContent): Promise<Message>;
-    editParent(content: MessageWebhookContent): Promise<Message>;
+    editParent(content: MessageWebhookContent): Promise<void>;
     getOriginalMessage(): Promise<Message>
     pong(): Promise<void>;
   }
