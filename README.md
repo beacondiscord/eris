@@ -10,10 +10,19 @@ You can find some documentation [here](https://eris.owo-whats-this.dev/v9-intera
 npm i DonovanDMC/eris#v9-interactions
 ```
 
-#### Included Pull Requests:
-* [@Catboi8](https://github.com/Catboi8) [[Support Interactions](https://github.com/abalabahaha/eris/pull/1210)]
-* [@bsian03](https://github.com/bsian03) [[Discord API V9](https://github.com/abalabahaha/eris/pull/1216)]
+#### Pull Requests
+<details>
+<summary>Currently Included</summary>
+<ul>
+<li><a href="https://github.com/Catboi8">@Catboi8</a> [<a href="https://github.com/abalabahaha/eris/pull/1210">Support Interactions</a>]</li>
+<li><a href="https://github.com/bsian03">@bsian03</a> [<a href="https://github.com/abalabahaha/eris/pull/1216">Discord API V9</a>]</li>
+</ul>
+</details>
+
+<details>
+<summary>Previously Included</summary>
+</details>
 
 #### Table of Contents
-* [everything](https://github.com/DonovanDMC/eris/tree/everything)
-* **v9-interactions**
+- [everything](https://github.com/DonovanDMC/eris/tree/everything)
+- **v9-interactions**
