@@ -1018,7 +1018,7 @@ declare namespace Eris {
     /** @deprecated */
     embed?: EmbedOptions;
     embeds?: EmbedOptions[];
-    file?: MessageFile | MessageFile[];
+    file?: FileContent | FileContent[];
     flags?: number;
     messageReference?: MessageReferenceReply;
     /** @deprecated */
