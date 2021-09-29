@@ -16,19 +16,26 @@ declare namespace Eris {
   // TYPES
 
   // Cache
-  type Uncached = { id: string };
+  interface Uncached { id: string }
 
   // Channel
   type AnyChannel = AnyGuildChannel | PrivateChannel;
   type AnyGuildChannel = GuildTextableChannel | AnyVoiceChannel | CategoryChannel | StoreChannel;
+  type AnyThreadChannel = NewsThreadChannel | PrivateThreadChannel | PublicThreadChannel | ThreadChannel;
   type AnyVoiceChannel = VoiceChannel | StageChannel;
-  type ChannelTypes = Constants["ChannelTypes"][keyof Constants["ChannelTypes"]];
   type GuildTextableChannel = TextChannel | NewsChannel;
-  type InviteChannel = InvitePartialChannel | Exclude<AnyGuildChannel, CategoryChannel>;
+  type GuildTextableWithThread = GuildTextableChannel | AnyThreadChannel;
+  type InviteChannel = InvitePartialChannel | Exclude<AnyGuildChannel, CategoryChannel | AnyThreadChannel>;
   type PossiblyUncachedTextable = Textable | Uncached;
   type PossiblyUncachedTextableChannel = TextableChannel | Uncached;
   type TextableChannel = (GuildTextable & GuildTextableChannel) | (Textable & PrivateChannel);
-  type VideoQualityMode = 1 | 2;
+  type VideoQualityMode = Constants["VideoQualityModes"][keyof Constants["VideoQualityModes"]];
+  type ChannelTypes = GuildChannelTypes | PrivateChannelTypes;
+  type GuildChannelTypes = Exclude<Constants["ChannelTypes"][keyof Constants["ChannelTypes"]], PrivateChannelTypes>;
+  type TextChannelTypes = GuildTextChannelTypes | PrivateChannelTypes;
+  type GuildTextChannelTypes = Constants["ChannelTypes"][keyof Pick<Constants["ChannelTypes"], "GUILD_TEXT" | "GUILD_NEWS">];
+  type GuildVoiceChannelTypes = Constants["ChannelTypes"][keyof Pick<Constants["ChannelTypes"], "GUILD_VOICE" | "GUILD_STAGE">];
+  type PrivateChannelTypes = Constants["ChannelTypes"][keyof Pick<Constants["ChannelTypes"], "DM" | "GROUP_DM">];
 
   // Command
   type CommandGenerator = CommandGeneratorFunction | MessageContent | MessageContent[] | CommandGeneratorFunction[];
@@ -45,22 +52,25 @@ declare namespace Eris {
   type RequestMethod = "GET" | "PATCH" | "DELETE" | "POST" | "PUT";
 
   // Guild
-  type DefaultNotifications = 0 | 1;
-  type ExplicitContentFilter = 0 | 1 | 2;
-  type GuildFeatures = "ANIMATED_ICON" | "BANNER" | "COMMERCE" | "COMMUNITY" | "DISCOVERABLE" | "FEATURABLE" | "INVITE_SPLASH" | "MEMBER_VERIFICATION_GATE_ENABLED" | "NEWS" | "PARTNERED" | "PREVIEW_ENABLED" | "VANITY_URL" | "VERIFIED" | "VIP_REGIONS" | "WELCOME_SCREEN_ENABLED" | "TICKETED_EVENTS_ENABLED" | "MONETIZATION_ENABLED" | "MORE_STICKERS" | "THREE_DAY_THREAD_ARCHIVE" | "SEVEN_DAY_THREAD_ARCHIVE" | "PRIVATE_THREADS";
-  type NSFWLevel = 0 | 1 | 2 | 3;
+  type DefaultNotifications = Constants["DefaultMessageNotificationLevels"][keyof Constants["DefaultMessageNotificationLevels"]];
+  type ExplicitContentFilter = Constants["ExplicitContentFilterLevels"][keyof Constants["ExplicitContentFilterLevels"]];
+  type GuildFeatures = Constants["GuildFeatures"][number];
+  type NSFWLevel = Constants["GuildNSFWLevels"][keyof Constants["GuildNSFWLevels"]];
   type PossiblyUncachedGuild = Guild | Uncached;
-  type PremiumTier = 0 | 1 | 2 | 3;
-  type VerificationLevel = 0 | 1 | 2 | 3 | 4;
+  type PremiumTier = Constants["PremiumTiers"][keyof Constants["PremiumTiers"]];
+  type VerificationLevel = Constants["VerificationLevels"][keyof Constants["VerificationLevels"]];
+  type SystemChannelFlags = Constants["SystemChannelFlags"][keyof Constants["SystemChannelFlags"]];
 
   // Message
   type ActionRowComponents = Button | SelectMenu;
   type Button = InteractionButton | URLButton;
   type Component = ActionRow | ActionRowComponents;
-  type ImageFormat = "jpg" | "jpeg" | "png" | "gif" | "webp";
+  type ImageFormat = Constants["ImageFormats"][number];
   type MessageContent = string | AdvancedMessageContent;
-  type MFALevel = 0 | 1;
+  type MessageContentEdit = string | AdvancedMessageContentEdit;
+  type MFALevel = (Constants["MFALevels"])[keyof Constants["MFALevels"]];
   type PossiblyUncachedMessage = Message | { channel: TextableChannel | { id: string; guild?: Uncached }; guildID?: string; id: string };
+  type InteractionType = Constants["ApplicationCommandTypes"][keyof Constants["ApplicationCommandTypes"]];
 
   // Interaction
   type InteractionDataOptions = InteractionDataOptionsSubCommand | InteractionDataOptionsSubCommandGroup | InteractionDataOptionsWithValue;
@@ -202,16 +212,20 @@ declare namespace Eris {
   }
 
   // Permission
-  type PermissionType = 0 | 1;
+  type PermissionType = Constants["PermissionOverwriteTypes"][keyof Constants["PermissionOverwriteTypes"]];
 
   // Presence/Relationship
-  type ActivityType = BotActivityType | 4;
-  type BotActivityType = 0 | 1 | 2 | 3 | 5;
+  type ActivityType = BotActivityType | Constants["ActivityTypes"]["CUSTOM"];
+  type BotActivityType = Constants["ActivityTypes"][Exclude<keyof Constants["ActivityTypes"], "CUSTOM">];
   type FriendSuggestionReasons = { name: string; platform_type: string; type: number }[];
   type Status = "online" | "idle" | "dnd" | "offline";
 
+  // Thread
+  type AutoArchiveDuration = 60 | 1440 | 4320 | 10080;
+
   // Voice
   type ConverterCommand = "./ffmpeg" | "./avconv" | "ffmpeg" | "avconv";
+  type StageInstancePrivacyLevel = 1 | 2;
 
   // Webhook
   type MessageWebhookContent = Pick<WebhookPayload, "content" | "embeds" | "file" | "allowedMentions" | "components">;
@@ -250,7 +264,12 @@ declare namespace Eris {
     userLimit?: number;
   }
   interface EditChannelOptions extends Omit<CreateChannelOptions, "permissionOverwrites" | "reason"> {
+    archived?: boolean;
+    autoArchiveDuration?: AutoArchiveDuration;
+    defaultAutoArchiveDuration?: AutoArchiveDuration;
     icon?: string;
+    invitable?: boolean;
+    locked?: boolean;
     name?: string;
     ownerID?: string;
     rtcRegion?: string | null;
@@ -273,7 +292,7 @@ declare namespace Eris {
     createWebhook(options: { name: string; avatar?: string | null }, reason?: string): Promise<Webhook>;
     deleteMessages(messageIDs: string[], reason?: string): Promise<void>;
     getWebhooks(): Promise<Webhook[]>;
-    purge(limit: number, filter?: (message: Message<this>) => boolean, before?: string, after?: string, reason?: string): Promise<number>;
+    purge(options: PurgeChannelOptions): Promise<number>;
     removeMessageReactionEmoji(messageID: string, reaction: string): Promise<void>;
     removeMessageReactions(messageID: string): Promise<void>;
     sendTyping(): Promise<void>;
@@ -303,9 +322,11 @@ declare namespace Eris {
     addMessageReaction(messageID: string, reaction: string): Promise<void>;
     /** @deprecated */
     addMessageReaction(messageID: string, reaction: string, userID: string): Promise<void>;
-    createMessage(content: MessageContent, file?: MessageFile | MessageFile[]): Promise<Message>;
+    createMessage(content: MessageContent): Promise<Message>;
+    /** @deprecated */
+    createMessage(content: MessageContent, file?: FileContent | FileContent[]): Promise<Message>;
     deleteMessage(messageID: string, reason?: string): Promise<void>;
-    editMessage(messageID: string, content: MessageContent): Promise<Message>;
+    editMessage(messageID: string, content: MessageContentEdit): Promise<Message>;
     getMessage(messageID: string): Promise<Message>;
     getMessageReaction(messageID: string, reaction: string, options?: GetMessageReactionOptions): Promise<User[]>;
     /** @deprecated */
@@ -319,6 +340,16 @@ declare namespace Eris {
     sendTyping(): Promise<void>;
     unpinMessage(messageID: string): Promise<void>;
     unsendMessage(messageID: string): Promise<void>;
+  }
+  // @ts-ignore ts(2430) - ThreadTextable can't properly extend Textable because of getMessageReaction deprecated overload
+  interface ThreadTextable extends Textable {
+    lastPinTimestamp?: number;
+    createMessage(content: MessageContent, file?: FileContent | FileContent[]): Promise<Message<ThreadChannel>>;
+    editMessage(messageID: string, content: MessageContentEdit): Promise<Message<ThreadChannel>>;
+    getMessage(messageID: string): Promise<Message<ThreadChannel>>;
+    getMessageReaction(messageID: string, reaction: string, options?: GetMessageReactionOptions): Promise<User[]>;
+    getMessages(options?: GetMessagesOptions): Promise<Message<ThreadChannel>[]>;
+    getPins(): Promise<Message<ThreadChannel>[]>;
   }
   interface WebhookData {
     channelID: string;
@@ -532,6 +563,7 @@ declare namespace Eris {
     name: string;
     ownerID: string;
     icon: string;
+    type: Constants["ChannelTypes"]["GROUP_DM"];
   }
   interface OldGuild {
     afkChannelID: string | null;
@@ -557,10 +589,10 @@ declare namespace Eris {
     premiumSubscriptionCount?: number;
     premiumTier: PremiumTier;
     publicUpdatesChannelID: string | null;
-    region: string;
     rulesChannelID: string | null;
     splash: string | null;
-    systemChannelFlags: number;
+    stickers?: Sticker[];
+    systemChannelFlags: SystemChannelFlags;
     systemChannelID: string | null;
     vanityURL: string | null;
     verificationLevel: VerificationLevel;
@@ -575,18 +607,18 @@ declare namespace Eris {
     rateLimitPerUser?: number;
     rtcRegion?: string | null;
     topic?: string | null;
-    type: Exclude<ChannelTypes, 1 | 3>;
+    type: GuildChannelTypes;
   }
   interface OldGuildTextChannel extends OldGuildChannel {
     nsfw: boolean;
     rateLimitPerUser: number;
     topic: string | null;
-    type: 0 | 5;
+    type: GuildTextChannelTypes;
   }
   interface OldGuildVoiceChannel extends OldGuildChannel {
     bitrate: number;
     rtcRegion: string | null;
-    type: 2 | 13;
+    type: GuildVoiceChannelTypes;
     userLimit: number;
     videoQualityMode: VideoQualityMode;
   }
@@ -618,6 +650,19 @@ declare namespace Eris {
     name: string;
     permissions: Permission;
     position: number;
+  }
+  interface OldStageInstance {
+    discoverableDisabled: boolean;
+    privacyLevel: StageInstancePrivacyLevel;
+    topic: string;
+  }
+  interface OldThread {
+    name: string;
+    rateLimitPerUser: number;
+    threadMetadata: ThreadMetadata;
+  }
+  interface OldThreadMember {
+    flags: number;
   }
   interface OldVoiceState {
     deaf: boolean;
@@ -658,6 +703,7 @@ declare namespace Eris {
     guildRoleCreate: [guild: Guild, role: Role];
     guildRoleDelete: [guild: Guild, role: Role];
     guildRoleUpdate: [guild: Guild, role: Role, oldRole: OldRole];
+    guildStickersUpdate: [guild: PossiblyUncachedGuild, stickers: Sticker[], oldStickers: Sticker[] | null];
     guildUnavailable: [guild: UnavailableGuild];
     guildUpdate: [guild: Guild, oldGuild: OldGuild];
     hello: [trace: string[], id: number];
@@ -679,6 +725,15 @@ declare namespace Eris {
     relationshipAdd: [relationship: Relationship];
     relationshipRemove: [relationship: Relationship];
     relationshipUpdate: [relationship: Relationship, oldRelationship: { type: number }];
+    stageInstanceCreate: [stageInstance: StageInstance];
+    stageInstanceDelete: [stageInstance: StageInstance];
+    stageInstanceUpdate: [stageInstance: StageInstance, oldStageInstance: OldStageInstance | null];
+    threadCreate: [channel: AnyThreadChannel];
+    threadDelete: [channel: AnyThreadChannel];
+    threadListSync: [guild: Guild, deletedThreads: (AnyThreadChannel | Uncached)[], activeThreads: AnyThreadChannel[], joinedThreadsMember: ThreadMember[]];
+    threadMembersUpdate: [channel: AnyThreadChannel, removedMembers: (ThreadMember | Uncached)[], addedMembers: ThreadMember[]];
+    threadMemberUpdate: [channel: AnyThreadChannel, member: ThreadMember, oldMember: OldThreadMember];
+    threadUpdate: [channel: AnyThreadChannel, oldChannel: OldThread | null];
     typingStart: [channel: GuildTextableChannel | Uncached, user: User | Uncached, member: Member]
     | [channel: PrivateChannel | Uncached, user: User | Uncached, member: null];
     unavailableGuildCreate: [guild: UnavailableGuild];
@@ -741,7 +796,7 @@ declare namespace Eris {
   interface RawRESTRequest {
     auth: boolean;
     body?: unknown;
-    file?: MessageFile;
+    file?: FileContent;
     method: string;
     resp: IncomingMessage;
     route: string;
@@ -763,7 +818,6 @@ declare namespace Eris {
     defaultNotifications?: DefaultNotifications;
     explicitContentFilter?: ExplicitContentFilter;
     icon?: string;
-    region?: string;
     roles?: PartialRole[];
     systemChannelID: string;
     verificationLevel?: VerificationLevel;
@@ -815,6 +869,7 @@ declare namespace Eris {
   interface GuildAuditLog {
     entries: GuildAuditLogEntry[];
     integrations: GuildIntegration[];
+    threads: AnyThreadChannel[];
     users: User[];
     webhooks: Webhook[];
   }
@@ -832,10 +887,9 @@ declare namespace Eris {
     ownerID?: string;
     preferredLocale?: string;
     publicUpdatesChannelID?: string;
-    region?: string;
     rulesChannelID?: string;
     splash?: string;
-    systemChannelFlags?: number;
+    systemChannelFlags?: SystemChannelFlags;
     systemChannelID?: string;
     verificationLevel?: VerificationLevel;
   }
@@ -929,6 +983,12 @@ declare namespace Eris {
     recipients?: { username: string }[];
     type: Exclude<ChannelTypes, 1>;
   }
+  interface InviteStageInstance {
+    members: Member[];
+    participantCount: number;
+    speakerCount: number;
+    topic: string;
+  }
 
   // Member/User
   interface FetchMembersOptions {
@@ -953,7 +1013,9 @@ declare namespace Eris {
     roles: string[];
   }
   interface PartialUser {
+    accentColor?: number | null;
     avatar: string | null;
+    banner?: string | null;
     discriminator: string;
     id: string;
     username: string;
@@ -972,7 +1034,7 @@ declare namespace Eris {
   // Message
   interface ActionRow {
     components: ActionRowComponents[];
-    type: 1;
+    type: Constants["ComponentTypes"]["ACTION_ROW"];
   }
   interface ActiveMessages {
     args: string[];
@@ -986,12 +1048,16 @@ declare namespace Eris {
     /** @deprecated */
     embed?: EmbedOptions;
     embeds?: EmbedOptions[];
+    file?: FileContent | FileContent[];
     flags?: number;
     messageReference?: MessageReferenceReply;
     /** @deprecated */
     messageReferenceID?: string;
     stickerIDs?: string[];
     tts?: boolean;
+  }
+  interface AdvancedMessageContentEdit extends AdvancedMessageContent {
+    file?: FileContent | FileContent[];
   }
   interface AllowedMentions {
     everyone?: boolean;
@@ -1014,7 +1080,15 @@ declare namespace Eris {
     disabled?: boolean;
     emoji?: Partial<PartialEmoji>;
     label?: string;
-    type: 2;
+    type: Constants["ComponentTypes"]["BUTTON"];
+  }
+  interface CreateStickerOptions extends Required<Pick<EditStickerOptions, "name" | "tags">> {
+    file: FileContent;
+  }
+  interface EditStickerOptions {
+    description?: string;
+    name?: string;
+    tags?: string;
   }
   interface SelectMenu {
     custom_id: string;
@@ -1023,7 +1097,7 @@ declare namespace Eris {
     min_values?: number;
     options: SelectMenuOptions[];
     placeholder?: string;
-    type: 3;
+    type: Constants["ComponentTypes"]["SELECT_MENU"];
   }
   interface SelectMenuOptions {
     default?: boolean;
@@ -1038,9 +1112,10 @@ declare namespace Eris {
     before?: string;
     limit?: number;
   }
+
   interface InteractionButton extends ButtonBase {
     custom_id: string;
-    style: 1 | 2 | 3 | 4;
+    style: Constants["ButtonTypes"][Exclude<keyof Constants["ButtonTypes"], "LINK">];
   }
   interface MessageActivity {
     party_id?: string;
@@ -1053,7 +1128,7 @@ declare namespace Eris {
     id: string;
     name: string;
   }
-  interface MessageFile {
+  interface FileContent {
     file: Buffer | string;
     name: string;
   }
@@ -1085,6 +1160,7 @@ declare namespace Eris {
     pack_id?: string;
     sort_value?: number;
     tags: string;
+    type: Constants["StickerTypes"][keyof Constants["StickerTypes"]];
     user?: User;
   }
   interface StickerItems {
@@ -1092,8 +1168,17 @@ declare namespace Eris {
     name: string;
     format_type: Constants["StickerFormats"][keyof Constants["StickerFormats"]];
   }
+  interface StickerPack {
+    id: string;
+    stickers: Sticker[];
+    name: string;
+    sku_id: string;
+    cover_sticker_id?: string;
+    description: string;
+    banner_asset_id: string;
+  }
   interface URLButton extends ButtonBase {
-    style: 5;
+    style: Constants["ButtonTypes"]["LINK"];
     url: string;
   }
 
@@ -1170,7 +1255,48 @@ declare namespace Eris {
     premium_subscriber?: true;
   }
 
+  // Thread
+  interface CreateThreadOptions {
+    autoArchiveDuration: AutoArchiveDuration;
+    name: string;
+  }
+  interface CreateThreadWithoutMessageOptions<T = AnyThreadChannel["type"]> extends CreateThreadOptions {
+    invitable: T extends PrivateThreadChannel["type"] ? boolean : never;
+    type: T;
+  }
+  interface GetArchivedThreadsOptions {
+    before?: Date;
+    limit?: number;
+  }
+  interface ListedChannelThreads<T extends ThreadChannel = AnyThreadChannel> extends ListedGuildThreads<T> {
+    hasMore: boolean;
+  }
+  interface ListedGuildThreads<T extends ThreadChannel = AnyThreadChannel> {
+    members: ThreadMember[];
+    threads: T[];
+  }
+  interface PrivateThreadMetadata extends ThreadMetadata {
+    invitable: boolean;
+  }
+  interface ThreadMetadata {
+    archiveTimestamp: number;
+    archived: boolean;
+    autoArchiveDuration: AutoArchiveDuration;
+    locked: boolean;
+  }
+
   // Voice
+  interface JoinVoiceChannelOptions {
+    opusOnly?: boolean;
+    selfDeaf?: boolean;
+    selfMute?: boolean;
+    shared?: boolean;
+  }
+  interface StageInstanceOptions {
+    privacyLevel?: StageInstancePrivacyLevel;
+    topic?: string;
+  }
+
   interface JoinVoiceChannelOptions {
     opusOnly?: boolean;
     selfDeaf?: boolean;
@@ -1221,13 +1347,18 @@ declare namespace Eris {
 
   // Webhook
   interface Webhook {
-    avatar?: string;
-    channel_id: string;
-    guild_id: string;
+    application_id: string | null;
+    avatar: string | null;
+    channel_id: string | null;
+    guild_id: string | null;
     id: string;
     name: string;
-    token: string;
-    user: PartialUser;
+    source_channel?: { id: string; name: string };
+    source_guild: { icon: string | null; id: string; name: string };
+    token?: string;
+    type: 1 | 2 | 3;
+    url?: string;
+    user?: PartialUser;
   }
   interface WebhookOptions {
     avatar?: string;
@@ -1241,8 +1372,9 @@ declare namespace Eris {
     components?: ActionRow[];
     content?: string;
     embeds?: EmbedOptions[];
-    file?: MessageFile | MessageFile[];
+    file?: FileContent | FileContent[];
     flags?: number;
+    threadID?: string;
     tts?: boolean;
     username?: string;
     wait?: boolean;
@@ -1281,6 +1413,19 @@ declare namespace Eris {
     user: PartialUser;
   }
   interface Constants {
+    ActivityTypes: {
+      GAME: 0;
+      STREAMING: 1;
+      LISTENING: 2;
+      WATCHING: 3;
+      CUSTOM: 4;
+      COMPETING: 5;
+    };
+    ApplicationCommandTypes: {
+      CHAT_INPUT: 1;
+      USER: 2;
+      MESSAGE: 3;
+    };
     AuditLogActions: {
       GUILD_UPDATE: 1;
 
@@ -1328,6 +1473,21 @@ declare namespace Eris {
       STAGE_INSTANCE_CREATE: 83;
       STAGE_INSTANCE_UPDATE: 84;
       STAGE_INSTANCE_DELETE: 85;
+
+      STICKER_CREATE: 90;
+      STICKER_UPDATE: 91;
+      STICKER_DELETE: 92;
+
+      THREAD_CREATE: 110;
+      THREAD_UPDATE: 111;
+      THREAD_DELETE: 112;
+    };
+    ButtonTypes: {
+      PRIMARY: 1;
+      SECONDARY: 2;
+      SUCCESS: 3;
+      DANGER: 4;
+      LINK: 5;
     };
     ChannelTypes: {
       GUILD_TEXT: 0;
@@ -1337,7 +1497,24 @@ declare namespace Eris {
       GUILD_CATEGORY: 4;
       GUILD_NEWS: 5;
       GUILD_STORE: 6;
+      GUILD_NEWS_THREAD: 10;
+      GUILD_PUBLIC_THREAD: 11;
+      GUILD_PRIVATE_THREAD: 12;
       GUILD_STAGE: 13;
+    };
+    ComponentTypes: {
+      ACTION_ROW: 1;
+      BUTTON: 2;
+      SELECT_MENU: 3;
+    };
+    DefaultMessageNotificationLevels: {
+      ALL_MESSAGES: 0;
+      ONLY_MENTIONS: 1;
+    };
+    ExplicitContentFilterLevels: {
+      DISABLED: 0;
+      MEMBERS_WITHOUT_ROLES: 1;
+      ALL_MEMBERS: 2;
     };
     GATEWAY_VERSION: 8;
     GatewayOPCodes: {
@@ -1355,6 +1532,13 @@ declare namespace Eris {
       HEARTBEAT_ACK: 11;
       SYNC_GUILD: 12;
       SYNC_CALL: 13;
+    };
+    GuildFeatures: ["ANIMATED_ICON", "BANNER", "COMMERCE", "COMMUNITY", "DISCOVERABLE", "FEATURABLE", "INVITE_SPLASH", "MEMBER_VERIFICATION_GATE_ENABLED", "NEWS", "PARTNERED", "PREVIEW_ENABLED", "VANITY_URL", "VERIFIED", "VIP_REGIONS", "WELCOME_SCREEN_ENABLED", "TICKETED_EVENTS_ENABLED", "MONETIZATION_ENABLED", "MORE_STICKERS", "THREE_DAY_THREAD_ARCHIVE", "SEVEN_DAY_THREAD_ARCHIVE", "PRIVATE_THREADS"];
+    GuildNSFWLevels: {
+      DEFAULT: 0;
+      EXPLICIT: 1;
+      SAFE: 2;
+      AGE_RESTRICTED: 3;
     };
     ImageFormats: ["jpg", "jpeg", "png", "webp", "gif"];
     ImageSizeBoundaries: {
@@ -1380,6 +1564,10 @@ declare namespace Eris {
       directMessageReactions: 8192;
       directMessageTyping: 16384;
     };
+    MFALevels: {
+      NONE: 0;
+      ELEVATED: 1;
+    };
     MessageActivityTypes: {
       JOIN: 1;
       SPECTATE: 2;
@@ -1387,11 +1575,12 @@ declare namespace Eris {
       JOIN_REQUEST: 5;
     };
     MessageFlags: {
-      CROSSPOSTED: 0;
+      CROSSPOSTED: 1;
       IS_CROSSPOST: 2;
       SUPPRESS_EMBEDS: 4;
       SOURCE_MESSAGE_DELETED: 8;
       URGENT: 16;
+      HAS_THREAD: 32;
       EPHEMERAL: 64;
     };
     MessageTypes: {
@@ -1413,11 +1602,16 @@ declare namespace Eris {
       GUILD_DISCOVERY_REQUALIFIED: 15;
       GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING: 16;
       GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING: 17;
+      THREAD_CREATED: 18;
       REPLY: 19;
       CHAT_INPUT_COMMAND: 20;
-
+      THREAD_STARTER_MESSAGE: 21;
       GUILD_INVITE_REMINDER: 22;
       CONTEXT_MENU_COMMAND:  23;
+    };
+    PermissionOverwriteTypes: {
+      ROLE: 0;
+      USER: 1;
     };
     Permissions: {
       createInstantInvite: 1n;
@@ -1465,17 +1659,41 @@ declare namespace Eris {
       /** @deprecated */
       useSlashCommands: 2147483648n;
       voiceRequestToSpeak: 4294967296n;
+      manageThreads: 17179869184n;
+      createPublicThreads: 34359738368n;
+      createPrivateThreads: 68719476736n;
       useExternalStickers: 137438953472n;
+      sendMessagesInThreads: 274877906944n;
       allGuild: 2080899262n;
-      allText: 140392266833n;
+      allText: 535529258065n;
       allVoice: 4629464849n;
-      all: 146028888063n;
+      all: 541165879295n;
     };
-    REST_VERSION: 8;
+    REST_VERSION: 9;
+    StickerTypes: {
+      STANDARD: 1;
+      GUILD: 2;
+    };
+    PremiumTiers: {
+      NONE: 0;
+      TIER_1: 1;
+      TIER_2: 2;
+      TIER_3: 3;
+    };
+    PremiumTypes: {
+      NONE: 0;
+      NITRO_CLASSIC: 1;
+      NITRO: 2;
+    };
     StickerFormats: {
       PNG: 1;
       APNG: 2;
       LOTTIE: 3;
+    };
+    SystemChannelFlags: {
+      SUPPRESS_JOIN_NOTIFICATIONS: 1;
+      SUPPRESS_PREMIUM_SUBSCRIPTIONS: 2;
+      SUPPRESS_GUILD_REMINDER_NOTIFICATIONS: 4;
     };
     SystemJoinMessages: [
       "%user% joined the party.",
@@ -1512,6 +1730,17 @@ declare namespace Eris {
       /** @deprecated */
       VERIFIED_BOT_DEVELOPER: 131072;
       DISCORD_CERTIFIED_MODERATOR: 262144;
+    };
+    VerificationLevels: {
+      NONE: 0;
+      LOW: 1;
+      MEDIUM: 2;
+      HIGH: 3;
+      VERY_HIGH: 4;
+    };
+    VideoQualityModes: {
+      AUTO: 1;
+      FULL: 2;
     };
     VoiceOPCodes: {
       IDENTIFY: 0;
@@ -1555,16 +1784,6 @@ declare namespace Eris {
     ApplicationCommandPermissionTypes: {
       ROLE: 1;
       USER: 2;
-    };
-    ApplicationCommandTypes: {
-      CHAT_INPUT: 1;
-      USER:       2;
-      MESSAGE:    3;
-    };
-    ComponentTypes: {
-      ACTION_ROW: 1;
-      BUTTON: 2;
-      SELECT_MENU: 3;
     };
   }
 
@@ -1699,7 +1918,7 @@ declare namespace Eris {
 
   export class CategoryChannel extends GuildChannel {
     channels: Collection<Exclude<AnyGuildChannel, CategoryChannel>>;
-    type: 4;
+    type: Constants["ChannelTypes"]["GUILD_CATEGORY"];
     edit(options: Omit<CreateChannelOptions, "permissionOverwrites" | "reason">, reason?: string): Promise<this>;
   }
 
@@ -1734,6 +1953,7 @@ declare namespace Eris {
     requestHandler: RequestHandler;
     shards: ShardManager;
     startTime: number;
+    threadGuildMap: { [s: string]: string };
     unavailableGuilds: Collection<UnavailableGuild>;
     uptime: number;
     user: ExtendedUser;
@@ -1761,37 +1981,37 @@ declare namespace Eris {
     createChannel(
       guildID: string,
       name: string,
-      type: 0,
+      type: Constants["ChannelTypes"]["GUILD_TEXT"],
       options?: CreateChannelOptions
     ): Promise<TextChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type: 2,
+      type: Constants["ChannelTypes"]["GUILD_VOICE"],
       options?: CreateChannelOptions
     ): Promise<VoiceChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type: 4,
+      type: Constants["ChannelTypes"]["GUILD_CATEGORY"],
       options?: CreateChannelOptions
     ): Promise<CategoryChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type: 5,
+      type: Constants["ChannelTypes"]["GUILD_NEWS"],
       options?: CreateChannelOptions
     ): Promise<NewsChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type: 6,
+      type: Constants["ChannelTypes"]["GUILD_STORE"],
       options?: CreateChannelOptions
     ): Promise<StoreChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type: 13,
+      type: Constants["ChannelTypes"]["GUILD_STAGE"],
       options?: CreateChannelOptions
     ): Promise<StageChannel>;
     createChannel(
@@ -1804,7 +2024,7 @@ declare namespace Eris {
     createChannel(
       guildID: string,
       name: string,
-      type: 0,
+      type: Constants["ChannelTypes"]["GUILD_TEXT"],
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<TextChannel>;
@@ -1812,7 +2032,7 @@ declare namespace Eris {
     createChannel(
       guildID: string,
       name: string,
-      type: 2,
+      type: Constants["ChannelTypes"]["GUILD_VOICE"],
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<VoiceChannel>;
@@ -1820,7 +2040,7 @@ declare namespace Eris {
     createChannel(
       guildID: string,
       name: string,
-      type: 4,
+      type: Constants["ChannelTypes"]["GUILD_CATEGORY"],
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<CategoryChannel>;
@@ -1828,7 +2048,7 @@ declare namespace Eris {
     createChannel(
       guildID: string,
       name: string,
-      type: 5,
+      type: Constants["ChannelTypes"]["GUILD_NEWS"],
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<NewsChannel>;
@@ -1836,7 +2056,7 @@ declare namespace Eris {
     createChannel(
       guildID: string,
       name: string,
-      type: 6,
+      type: Constants["ChannelTypes"]["GUILD_STORE"],
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<StoreChannel>;
@@ -1844,7 +2064,7 @@ declare namespace Eris {
     createChannel(
       guildID: string,
       name: string,
-      type: 13,
+      type: Constants["ChannelTypes"]["GUILD_STAGE"],
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<StageChannel>;
@@ -1872,10 +2092,16 @@ declare namespace Eris {
     createGuildCommand(guildID: string, command: ApplicationCommandStructure): Promise<ApplicationCommand>;
     createGuildEmoji(guildID: string, options: EmojiOptions, reason?: string): Promise<Emoji>;
     createGuildFromTemplate(code: string, name: string, icon?: string): Promise<Guild>;
+    createGuildSticker(guildID: string, options: CreateStickerOptions, reason?: string): Promise<Sticker>;
     createGuildTemplate(guildID: string, name: string, description?: string | null): Promise<GuildTemplate>;
     createInteractionResponse(interactionID: string, interactionToken: string, options: InteractionOptions): Promise<void>;
-    createMessage(channelID: string, content: MessageContent, file?: MessageFile | MessageFile[]): Promise<Message>;
+    createMessage(channelID: string, content: MessageContent): Promise<Message>;
+    /** @deprecated */
+    createMessage(channelID: string, content: MessageContent, file?: FileContent | FileContent[]): Promise<Message>;
     createRole(guildID: string, options?: RoleOptions | Role, reason?: string): Promise<Role>;
+    createStageInstance(channelID: string, options: StageInstanceOptions): Promise<StageInstance>;
+    createThreadWithMessage(channelID: string, options: CreateThreadOptions): Promise<NewsThreadChannel | PublicThreadChannel>;
+    createThreadWithoutMessage(channelID: string, options: CreateThreadWithoutMessageOptions): Promise<PrivateThreadChannel>;
     crosspostMessage(channelID: string, messageID: string): Promise<Message>;
     deleteChannel(channelID: string, reason?: string): Promise<void>;
     deleteChannelPermission(channelID: string, overwriteID: string, reason?: string): Promise<void>;
@@ -1885,6 +2111,7 @@ declare namespace Eris {
     deleteGuildDiscoverySubcategory(guildID: string, categoryID: string, reason?: string): Promise<void>;
     deleteGuildEmoji(guildID: string, emojiID: string, reason?: string): Promise<void>;
     deleteGuildIntegration(guildID: string, integrationID: string): Promise<void>;
+    deleteGuildSticker(guildID: string, stickerID: string, reason?: string): Promise<void>;
     deleteGuildTemplate(guildID: string, code: string): Promise<GuildTemplate>;
     deleteInvite(inviteID: string, reason?: string): Promise<void>;
     deleteMessage(channelID: string, messageID: string, reason?: string): Promise<void>;
@@ -1892,6 +2119,7 @@ declare namespace Eris {
     deleteRole(guildID: string, roleID: string, reason?: string): Promise<void>;
     deleteSelfConnection(platform: string, id: string): Promise<void>;
     deleteSelfPremiumSubscription(): Promise<void>;
+    deleteStageInstance(channelID: string): Promise<void>;
     deleteUserNote(userID: string): Promise<void>;
     deleteWebhook(webhookID: string, token?: string, reason?: string): Promise<void>;
     deleteWebhookMessage(webhookID: string, token: string, messageID: string): Promise<void>;
@@ -1925,12 +2153,13 @@ declare namespace Eris {
     ): Promise<Emoji>;
     editGuildIntegration(guildID: string, integrationID: string, options: IntegrationOptions): Promise<void>;
     editGuildMember(guildID: string, memberID: string, options: MemberOptions, reason?: string): Promise<Member>;
+    editGuildSticker(guildID: string, stickerID: string, options?: EditStickerOptions, reason?: string): Promise<Sticker>;
     editGuildTemplate(guildID: string, code: string, options: GuildTemplateOptions): Promise<GuildTemplate>;
     editGuildVanity(guildID: string, code: string | null): Promise<GuildVanity>;
     editGuildVoiceState(guildID: string, options: VoiceStateOptions, userID?: string): Promise<void>;
     editGuildWelcomeScreen(guildID: string, options: WelcomeScreenOptions): Promise<WelcomeScreen>;
     editGuildWidget(guildID: string, options: Widget): Promise<Widget>;
-    editMessage(channelID: string, messageID: string, content: MessageContent): Promise<Message>;
+    editMessage(channelID: string, messageID: string, content: MessageContentEdit): Promise<Message>;
     /** @deprecated */
     editNickname(guildID: string, nick: string, reason?: string): Promise<void>;
     editRole(guildID: string, roleID: string, options: RoleOptions, reason?: string): Promise<Role>; // TODO not all options are available?
@@ -1942,6 +2171,7 @@ declare namespace Eris {
       data: { friendSync: boolean; visibility: number }
     ): Promise<Connection>;
     editSelfSettings(data: UserSettings): Promise<UserSettings>;
+    editStageInstance(channelID: string, options: StageInstanceOptions): Promise<StageInstance>;
     editStatus(status: Status, activities?: ActivityPartial<BotActivityType>[] | ActivityPartial<BotActivityType>): void;
     editStatus(activities?: ActivityPartial<BotActivityType>[] | ActivityPartial<BotActivityType>): void;
     editUserNote(userID: string, note: string): Promise<void>;
@@ -1963,11 +2193,16 @@ declare namespace Eris {
       secret: string,
       code: string
     ): Promise<{ backup_codes: { code: string; consumed: boolean }[]; token: string }>;
-    executeSlackWebhook(webhookID: string, token: string, options: Record<string, unknown> & { auth?: boolean }): Promise<void>;
-    executeSlackWebhook(webhookID: string, token: string, options: Record<string, unknown> & { auth?: boolean; wait: true }): Promise<Message<GuildTextableChannel>>;
+    executeSlackWebhook(webhookID: string, token: string, options: Record<string, unknown> & { auth?: boolean; threadID?: string }): Promise<void>;
+    executeSlackWebhook(webhookID: string, token: string, options: Record<string, unknown> & { auth?: boolean; threadID?: string; wait: true }): Promise<Message<GuildTextableChannel>>;
     executeWebhook(webhookID: string, token: string, options: WebhookPayload & { wait: true }): Promise<Message<GuildTextableChannel>>;
     executeWebhook(webhookID: string, token: string, options: WebhookPayload): Promise<void>;
     followChannel(channelID: string, webhookChannelID: string): Promise<ChannelFollow>;
+    getActiveGuildThreads(guildID: string): Promise<ListedGuildThreads>;
+    /** @deprecated */
+    getActiveThreads(channelID: string): Promise<ListedChannelThreads>;
+    getArchivedThreads(channelID: string, type: "private", options?: GetArchivedThreadsOptions): Promise<ListedChannelThreads<PrivateThreadChannel>>;
+    getArchivedThreads(channelID: string, type: "public", options?: GetArchivedThreadsOptions): Promise<ListedChannelThreads<PublicThreadChannel>>;
     getBotGateway(): Promise<{ session_start_limit: { max_concurrency: number; remaining: number; reset_after: number; total: number }; shards: number; url: string }>;
     getChannel(channelID: string): AnyChannel;
     getChannelInvites(channelID: string): Promise<Invite[]>;
@@ -2002,6 +2237,7 @@ declare namespace Eris {
     getGuildWidgetSettings(guildID: string): Promise<Widget>;
     getInvite(inviteID: string, withCounts?: false): Promise<Invite<"withoutCount">>;
     getInvite(inviteID: string, withCounts: true): Promise<Invite<"withCount">>;
+    getJoinedPrivateArchivedThreads(channelID: string, options?: GetArchivedThreadsOptions): Promise<ListedChannelThreads<PrivateThreadChannel>>;
     getMessage(channelID: string, messageID: string): Promise<Message>;
     getMessageReaction(channelID: string, messageID: string, reaction: string, options?: GetMessageReactionOptions): Promise<User[]>;
     /** @deprecated */
@@ -2009,6 +2245,7 @@ declare namespace Eris {
     getMessages(channelID: string, options?: GetMessagesOptions): Promise<Message[]>;
     /** @deprecated */
     getMessages(channelID: string, limit?: number, before?: string, after?: string, around?: string): Promise<Message[]>;
+    getNitroStickerPacks(): Promise<{ sticker_packs: StickerPack[] }>;
     getOAuthApplication(appID?: string): Promise<OAuthApplicationInfo>;
     getPins(channelID: string): Promise<Message[]>;
     getPruneCount(guildID: string, options?: GetPruneOptions): Promise<number>;
@@ -2025,6 +2262,9 @@ declare namespace Eris {
     getRESTGuilds(options?: GetRESTGuildsOptions): Promise<Guild[]>;
     /** @deprecated */
     getRESTGuilds(limit?: number, before?: string, after?: string): Promise<Guild[]>;
+    getRESTGuildSticker(guildID: string, stickerID: string): Promise<Sticker>;
+    getRESTGuildStickers(guildID: string): Promise<Sticker[]>;
+    getRESTSticker(stickerID: string): Promise<Sticker>;
     getRESTUser(userID: string): Promise<User>;
     getSelf(): Promise<ExtendedUser>;
     getSelfBilling(): Promise<{
@@ -2061,13 +2301,17 @@ declare namespace Eris {
       status: number;
     }[]>;
     getSelfSettings(): Promise<UserSettings>;
+    getStageInstance(channelID: string): Promise<StageInstance>;
+    getThreadMembers(channelID: string): Promise<ThreadMember[]>;
     getUserProfile(userID: string): Promise<UserProfile>;
     getVoiceRegions(guildID?: string): Promise<VoiceRegion[]>;
     getWebhook(webhookID: string, token?: string): Promise<Webhook>;
     getWebhookMessage(webhookID: string, token: string, messageID: string): Promise<Message<GuildTextableChannel>>;
+    joinThread(channelID: string, userID?: string): Promise<void>;
     joinVoiceChannel(channelID: string, options?: JoinVoiceChannelOptions): Promise<VoiceConnection>;
     kickGuildMember(guildID: string, userID: string, reason?: string): Promise<void>;
     leaveGuild(guildID: string): Promise<void>;
+    leaveThread(channelID: string, userID?: string): Promise<void>;
     leaveVoiceChannel(channelID: string): void;
     off<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
     off(event: string, listener: (...args: any[]) => void): this;
@@ -2206,7 +2450,7 @@ declare namespace Eris {
   export class ExtendedUser extends User {
     email: string;
     mfaEnabled: boolean;
-    premiumType: 0 | 1 | 2;
+    premiumType: Constants["PremiumTypes"][keyof Constants["PremiumTypes"]];
     verified: boolean;
   }
 
@@ -2216,9 +2460,9 @@ declare namespace Eris {
     name: string;
     ownerID: string;
     recipients: Collection<User>;
-    type: 3;
+    type: Constants["ChannelTypes"]["GROUP_DM"];
     addRecipient(userID: string): Promise<void>;
-    dynamicIconURL(format?: ImageFormat, size?: number): string;
+    dynamicIconURL(format?: ImageFormat, size?: number): string | null;
     edit(options: { icon?: string; name?: string; ownerID?: string }): Promise<GroupChannel>;
     removeRecipient(userID: string): Promise<void>;
   }
@@ -2264,14 +2508,16 @@ declare namespace Eris {
     primaryCategory?: DiscoveryCategory;
     primaryCategoryID?: number;
     publicUpdatesChannelID: string;
-    region: string;
     roles: Collection<Role>;
     rulesChannelID: string | null;
     shard: Shard;
     splash: string | null;
     splashURL: string | null;
-    systemChannelFlags: number;
+    stageInstances: Collection<StageInstance>;
+    stickers?: Sticker[];
+    systemChannelFlags: SystemChannelFlags;
     systemChannelID: string | null;
+    threads: Collection<ThreadChannel>;
     unavailable: boolean;
     vanityURL: string | null;
     verificationLevel: VerificationLevel;
@@ -2285,30 +2531,31 @@ declare namespace Eris {
     banMember(userID: string, deleteMessageDays?: number, reason?: string): Promise<void>;
     bulkEditCommands(commands: ApplicationCommandStructure[]): Promise<ApplicationCommand[]>;
     createChannel(name: string): Promise<TextChannel>;
-    createChannel(name: string, type: 0, options?: CreateChannelOptions): Promise<TextChannel>;
-    createChannel(name: string, type: 2, options?: CreateChannelOptions): Promise<VoiceChannel>;
-    createChannel(name: string, type: 4, options?: CreateChannelOptions): Promise<CategoryChannel>;
-    createChannel(name: string, type: 5, options?: CreateChannelOptions | string): Promise<NewsChannel>;
-    createChannel(name: string, type: 6, options?: CreateChannelOptions | string): Promise<StoreChannel>;
-    createChannel(name: string, type: 13, options?: CreateChannelOptions | string): Promise<StageChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_TEXT"], options?: CreateChannelOptions): Promise<TextChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_VOICE"], options?: CreateChannelOptions): Promise<VoiceChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_CATEGORY"], options?: CreateChannelOptions): Promise<CategoryChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_NEWS"], options?: CreateChannelOptions | string): Promise<NewsChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_STORE"], options?: CreateChannelOptions | string): Promise<StoreChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_STAGE"], options?: CreateChannelOptions | string): Promise<StageChannel>;
     createChannel(name: string, type?: number, options?: CreateChannelOptions): Promise<unknown>;
     /** @deprecated */
-    createChannel(name: string, type: 0, reason?: string, options?: CreateChannelOptions | string): Promise<TextChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_TEXT"], reason?: string, options?: CreateChannelOptions | string): Promise<TextChannel>;
     /** @deprecated */
-    createChannel(name: string, type: 2, reason?: string, options?: CreateChannelOptions | string): Promise<VoiceChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_VOICE"], reason?: string, options?: CreateChannelOptions | string): Promise<VoiceChannel>;
     /** @deprecated */
-    createChannel(name: string, type: 4, reason?: string, options?: CreateChannelOptions | string): Promise<CategoryChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_CATEGORY"], reason?: string, options?: CreateChannelOptions | string): Promise<CategoryChannel>;
     /** @deprecated */
-    createChannel(name: string, type: 5, reason?: string, options?: CreateChannelOptions | string): Promise<NewsChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_NEWS"], reason?: string, options?: CreateChannelOptions | string): Promise<NewsChannel>;
     /** @deprecated */
-    createChannel(name: string, type: 6, reason?: string, options?: CreateChannelOptions | string): Promise<StoreChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_STORE"], reason?: string, options?: CreateChannelOptions | string): Promise<StoreChannel>;
     /** @deprecated */
-    createChannel(name: string, type: 13, reason?: string, options?: CreateChannelOptions | string): Promise<StageChannel>;
+    createChannel(name: string, type: Constants["ChannelTypes"]["GUILD_STAGE"], reason?: string, options?: CreateChannelOptions | string): Promise<StageChannel>;
     /** @deprecated */
     createChannel(name: string, type?: number, reason?: string, options?: CreateChannelOptions | string): Promise<unknown>;
     createCommand(command: ApplicationCommandStructure): Promise<ApplicationCommand>;
     createEmoji(options: { image: string; name: string; roles?: string[] }, reason?: string): Promise<Emoji>;
     createRole(options: RoleOptions | Role, reason?: string): Promise<Role>;
+    createSticker(options: CreateStickerOptions, reason?: string): Promise<Sticker>;
     createTemplate(name: string, description?: string | null): Promise<GuildTemplate>;
     delete(): Promise<void>;
     deleteCommand(commandID: string): Promise<void>;
@@ -2316,11 +2563,12 @@ declare namespace Eris {
     deleteEmoji(emojiID: string, reason?: string): Promise<void>;
     deleteIntegration(integrationID: string): Promise<void>;
     deleteRole(roleID: string): Promise<void>;
+    deleteSticker(stickerID: string, reason?: string): Promise<void>;
     deleteTemplate(code: string): Promise<GuildTemplate>;
-    dynamicBannerURL(format?: ImageFormat, size?: number): string;
-    dynamicDiscoverySplashURL(format?: ImageFormat, size?: number): string;
-    dynamicIconURL(format?: ImageFormat, size?: number): string;
-    dynamicSplashURL(format?: ImageFormat, size?: number): string;
+    dynamicBannerURL(format?: ImageFormat, size?: number): string | null;
+    dynamicDiscoverySplashURL(format?: ImageFormat, size?: number): string | null;
+    dynamicIconURL(format?: ImageFormat, size?: number): string | null;
+    dynamicSplashURL(format?: ImageFormat, size?: number): string | null;
     edit(options: GuildOptions, reason?: string): Promise<Guild>;
     editCommand(commandID: string, command: ApplicationCommandStructure): Promise<ApplicationCommand>;
     editCommandPermissions(permissions: ApplicationCommandPermissions[]): Promise<GuildApplicationCommandPermissions[]>;
@@ -2331,6 +2579,7 @@ declare namespace Eris {
     /** @deprecated */
     editNickname(nick: string): Promise<void>;
     editRole(roleID: string, options: RoleOptions): Promise<Role>;
+    editSticker(stickerID: string, options?: EditStickerOptions, reason?: string): Promise<Sticker>;
     editTemplate(code: string, options: GuildTemplateOptions): Promise<GuildTemplate>;
     editVanity(code: string | null): Promise<GuildVanity>;
     editVoiceState(options: VoiceStateOptions, userID?: string): Promise<void>;
@@ -2338,6 +2587,7 @@ declare namespace Eris {
     editWidget(options: Widget): Promise<Widget>;
     fetchAllMembers(timeout?: number): Promise<number>;
     fetchMembers(options?: FetchMembersOptions): Promise<Member[]>;
+    getActiveThreads(): Promise<ListedGuildThreads>;
     getAuditLog(options?: GetGuildAuditLogOptions): Promise<GuildAuditLog>;
     /** @deprecated */
     getAuditLogs(limit?: number, before?: string, actionType?: number, userID?: string): Promise<GuildAuditLog>;
@@ -2360,6 +2610,8 @@ declare namespace Eris {
     /** @deprecated */
     getRESTMembers(limit?: number, after?: string): Promise<Member[]>;
     getRESTRoles(): Promise<Role[]>;
+    getRESTSticker(stickerID: string): Promise<Sticker>;
+    getRESTStickers(): Promise<Sticker[]>;
     getTemplates(): Promise<GuildTemplate[]>;
     getVanity(): Promise<GuildVanity>;
     getVoiceRegions(): Promise<VoiceRegion[]>;
@@ -2393,7 +2645,7 @@ declare namespace Eris {
     message?: Message<GuildTextableChannel>;
     reason: string | null;
     role?: Role | { id: string; name: string };
-    target?: Guild | AnyGuildChannel | Member | Role | Invite | Emoji | Message<GuildTextableChannel> | null;
+    target?: Guild | AnyGuildChannel | Member | Role | Invite | Emoji | Sticker | Message<GuildTextableChannel> | null;
     targetID: string;
     user: User;
     constructor(data: BaseData, guild: Guild);
@@ -2406,7 +2658,7 @@ declare namespace Eris {
     parentID: string | null;
     permissionOverwrites: Collection<PermissionOverwrite>;
     position: number;
-    type: Exclude<ChannelTypes, 1 | 3>;
+    type: GuildChannelTypes;
     constructor(data: BaseData, client: Client);
     delete(reason?: string): Promise<void>;
     deletePermission(overwriteID: string, reason?: string): Promise<void>;
@@ -2461,9 +2713,9 @@ declare namespace Eris {
     splash: string | null;
     splashURL: string | null;
     constructor(data: BaseData, client: Client);
-    dynamicDiscoverySplashURL(format?: ImageFormat, size?: number): string;
-    dynamicIconURL(format?: ImageFormat, size?: number): string;
-    dynamicSplashURL(format?: ImageFormat, size?: number): string;
+    dynamicDiscoverySplashURL(format?: ImageFormat, size?: number): string | null;
+    dynamicIconURL(format?: ImageFormat, size?: number): string | null;
+    dynamicSplashURL(format?: ImageFormat, size?: number): string | null;
   }
 
   export class GuildTemplate {
@@ -2620,6 +2872,7 @@ declare namespace Eris {
     maxUses: CT extends "withMetadata" ? number : null;
     memberCount: CT extends "withMetadata" | "withoutCount" ? null : number;
     presenceCount: CT extends "withMetadata" | "withoutCount" ? null : number;
+    stageInstance: CH extends StageChannel ? InviteStageInstance : null;
     temporary: CT extends "withMetadata" ? boolean : null;
     uses: CT extends "withMetadata" ? number : null;
     constructor(data: BaseData, client: Client);
@@ -2627,9 +2880,12 @@ declare namespace Eris {
   }
 
   export class Member extends Base implements Presence {
+    accentColor?: number | null;
     activities?: Activity[];
     avatar: string | null;
     avatarURL: string;
+    banner?: string | null;
+    bannerURL: string | null;
     bot: boolean;
     clientStatus?: ClientStatus;
     createdAt: number;
@@ -2639,7 +2895,7 @@ declare namespace Eris {
     game: Activity | null;
     guild: Guild;
     id: string;
-    joinedAt: number;
+    joinedAt: number | null;
     mention: string;
     nick: string | null;
     pending?: boolean;
@@ -2665,6 +2921,7 @@ declare namespace Eris {
   export class Message<T extends PossiblyUncachedTextable = TextableChannel> extends Base {
     activity?: MessageActivity;
     application?: MessageApplication;
+    applicationID?: string;
     attachments: Attachment[];
     author: User;
     channel: T;
@@ -2678,11 +2935,11 @@ declare namespace Eris {
     editedTimestamp?: number;
     embeds: Embed[];
     flags: number;
-    guildID: T extends GuildTextable ? string : undefined;
+    guildID: T extends GuildTextableWithThread ? string : undefined;
     id: string;
     interaction: MessageInteraction | null;
     jumpLink: string;
-    member: T extends GuildTextable ? Member : null;
+    member: T extends GuildTextableWithThread ? Member : null;
     mentionEveryone: boolean;
     mentions: User[];
     messageReference: MessageReference | null;
@@ -2697,11 +2954,12 @@ declare namespace Eris {
     timestamp: number;
     tts: boolean;
     type: number;
-    webhookID: T extends GuildTextable ? string | undefined : undefined;
+    webhookID: T extends GuildTextableWithThread ? string | undefined : undefined;
     constructor(data: BaseData, client: Client);
     addReaction(reaction: string): Promise<void>;
     /** @deprecated */
     addReaction(reaction: string, userID: string): Promise<void>;
+    createThreadWithMessage(messageID: string, options: CreateThreadOptions): Promise<NewsThreadChannel | PublicThreadChannel>;
     crosspost(): Promise<T extends NewsChannel ? Message<NewsChannel> : never>;
     delete(reason?: string): Promise<void>;
     deleteWebhook(token: string): Promise<void>;
@@ -2720,11 +2978,17 @@ declare namespace Eris {
   // News channel rate limit is always 0
   export class NewsChannel extends TextChannel {
     rateLimitPerUser: 0;
-    type: 5;
+    type: Constants["ChannelTypes"]["GUILD_NEWS"];
     createInvite(options?: CreateInviteOptions, reason?: string): Promise<Invite<"withMetadata", NewsChannel>>;
-    createMessage(content: MessageContent, file?: MessageFile | MessageFile[]): Promise<Message<NewsChannel>>;
+    createMessage(content: MessageContent): Promise<Message<NewsChannel>>;
+    /** @deprecated */
+    createMessage(content: MessageContent, file?: FileContent | FileContent[]): Promise<Message<NewsChannel>>;
+    createThreadWithMessage(messageID: string, options: CreateThreadOptions): Promise<NewsThreadChannel>;
+
+
+
     crosspostMessage(messageID: string): Promise<Message<NewsChannel>>;
-    editMessage(messageID: string, content: MessageContent): Promise<Message<NewsChannel>>;
+    editMessage(messageID: string, content: MessageContentEdit): Promise<Message<NewsChannel>>;
     follow(webhookChannelID: string): Promise<ChannelFollow>;
     getInvites(): Promise<(Invite<"withMetadata", NewsChannel>)[]>;
     getMessage(messageID: string): Promise<Message<NewsChannel>>;
@@ -2732,6 +2996,16 @@ declare namespace Eris {
     /** @deprecated */
     getMessages(limit?: number, before?: string, after?: string, around?: string): Promise<Message<NewsChannel>[]>;
     getPins(): Promise<Message<NewsChannel>[]>;
+  }
+
+  export class NewsThreadChannel extends ThreadChannel {
+    type: 10;
+    createMessage(content: MessageContent, file?: FileContent | FileContent[]): Promise<Message<NewsThreadChannel>>;
+    edit(options: Pick<EditChannelOptions, "archived" | "autoArchiveDuration" | "locked" | "name" | "rateLimitPerUser">, reason?: string): Promise<this>;
+    editMessage(messageID: string, content: MessageContentEdit): Promise<Message<NewsThreadChannel>>;
+    getMessage(messageID: string): Promise<Message<NewsThreadChannel>>;
+    getMessages(options?: GetMessagesOptions): Promise<Message<NewsThreadChannel>[]>;
+    getPins(): Promise<Message<NewsThreadChannel>[]>;
   }
 
   export class Permission extends Base {
@@ -2770,13 +3044,15 @@ declare namespace Eris {
     lastMessageID: string;
     messages: Collection<Message<this>>;
     recipient: User;
-    type: 1 | 3;
+    type: PrivateChannelTypes;
     addMessageReaction(messageID: string, reaction: string): Promise<void>;
     /** @deprecated */
     addMessageReaction(messageID: string, reaction: string, userID: string): Promise<void>;
-    createMessage(content: MessageContent, file?: MessageFile | MessageFile[]): Promise<Message<PrivateChannel>>;
+    createMessage(content: MessageContent): Promise<Message<PrivateChannel>>;
+    /** @deprecated */
+    createMessage(content: MessageContent, file?: FileContent | FileContent[]): Promise<Message<PrivateChannel>>;
     deleteMessage(messageID: string, reason?: string): Promise<void>;
-    editMessage(messageID: string, content: MessageContent): Promise<Message<PrivateChannel>>;
+    editMessage(messageID: string, content: MessageContentEdit): Promise<Message<PrivateChannel>>;
     getMessage(messageID: string): Promise<Message<PrivateChannel>>;
     getMessageReaction(messageID: string, reaction: string, options?: GetMessageReactionOptions): Promise<User[]>;
     /** @deprecated */
@@ -2795,6 +3071,27 @@ declare namespace Eris {
     syncCall(): void;
     unpinMessage(messageID: string): Promise<void>;
     unsendMessage(messageID: string): Promise<void>;
+  }
+
+  export class PrivateThreadChannel extends ThreadChannel {
+    threadMetadata: PrivateThreadMetadata;
+    type: 12;
+    createMessage(content: MessageContent, file?: FileContent | FileContent[]): Promise<Message<PrivateThreadChannel>>;
+    edit(options: Pick<EditChannelOptions, "archived" | "autoArchiveDuration" | "invitable" | "locked" | "name" | "rateLimitPerUser">, reason?: string): Promise<this>;
+    editMessage(messageID: string, content: MessageContentEdit): Promise<Message<PrivateThreadChannel>>;
+    getMessage(messageID: string): Promise<Message<PrivateThreadChannel>>;
+    getMessages(options?: GetMessagesOptions): Promise<Message<PrivateThreadChannel>[]>;
+    getPins(): Promise<Message<PrivateThreadChannel>[]>;
+  }
+
+  export class PublicThreadChannel extends ThreadChannel {
+    type: 10 | 11;
+    createMessage(content: MessageContent, file?: FileContent | FileContent[]): Promise<Message<PublicThreadChannel>>;
+    edit(options: Pick<EditChannelOptions, "archived" | "autoArchiveDuration" | "locked" | "name" | "rateLimitPerUser">, reason?: string): Promise<this>;
+    editMessage(messageID: string, content: MessageContentEdit): Promise<Message<PublicThreadChannel>>;
+    getMessage(messageID: string): Promise<Message<PublicThreadChannel>>;
+    getMessages(options?: GetMessagesOptions): Promise<Message<PublicThreadChannel>[]>;
+    getPins(): Promise<Message<PublicThreadChannel>[]>;
   }
 
   export class Relationship extends Base implements Omit<Presence, "activities"> {
@@ -2818,7 +3115,7 @@ declare namespace Eris {
     /** @deprecated */
     constructor(client: Client, forceQueueing?: boolean);
     globalUnblock(): void;
-    request(method: RequestMethod, url: string, auth?: boolean, body?: { [s: string]: unknown }, file?: MessageFile, _route?: string, short?: boolean): Promise<unknown>;
+    request(method: RequestMethod, url: string, auth?: boolean, body?: { [s: string]: unknown }, file?: FileContent, _route?: string, short?: boolean): Promise<unknown>;
     routefy(url: string, method: RequestMethod): string;
     toString(): string;
     toJSON(props?: string[]): JSONCache;
@@ -2963,33 +3260,66 @@ declare namespace Eris {
 
   export class StageChannel extends VoiceChannel {
     topic?: string;
-    type: 13;
+    type: Constants["ChannelTypes"]["GUILD_STAGE"];
+    createInstance(options: StageInstanceOptions): Promise<StageInstance>;
+    deleteInstance(): Promise<void>;
+    editInstance(options: StageInstanceOptions): Promise<StageInstance>;
+    getInstance(): Promise<StageInstance>;
+  }
+
+  export class StageInstance extends Base {
+    channel: StageChannel | Uncached;
+    client: Client;
+    discoverableDisabled: boolean;
+    guild: Guild | Uncached;
+    privacyLevel: StageInstancePrivacyLevel;
+    topic: string;
+    constructor(data: BaseData, client: Client);
+    delete(): Promise<void>;
+    edit(options: StageInstanceOptions): Promise<StageInstance>;
+    update(data: BaseData): void;
   }
 
   export class StoreChannel extends GuildChannel {
-    type: 6;
+    type: Constants["ChannelTypes"]["GUILD_STORE"];
     edit(options: Omit<EditChannelOptions, "icon" | "ownerID">, reason?: string): Promise<this>;
   }
 
   export class TextChannel extends GuildChannel implements GuildTextable, Invitable {
+    defaultAutoArchiveDuration: AutoArchiveDuration;
     lastMessageID: string;
     lastPinTimestamp: number | null;
     messages: Collection<Message<this>>;
     rateLimitPerUser: number;
     topic: string | null;
-    type: 0 | 5;
+    type: GuildTextChannelTypes;
     constructor(data: BaseData, client: Client, messageLimit: number);
     addMessageReaction(messageID: string, reaction: string): Promise<void>;
     /** @deprecated */
     addMessageReaction(messageID: string, reaction: string, userID: string): Promise<void>;
     createInvite(options?: CreateInviteOptions, reason?: string): Promise<Invite<"withMetadata", TextChannel>>;
-    createMessage(content: MessageContent, file?: MessageFile | MessageFile[]): Promise<Message<TextChannel>>;
+    createMessage(content: MessageContent): Promise<Message<TextChannel>>;
+    /** @deprecated */
+    createMessage(content: MessageContent, file?: FileContent | FileContent[]): Promise<Message<TextChannel>>;
+    createThreadWithMessage(messageID: string, options: CreateThreadOptions): Promise<PublicThreadChannel>;
+
+
+    createThreadWithoutMessage(options: CreateThreadWithoutMessageOptions): Promise<PrivateThreadChannel>;
     createWebhook(options: { name: string; avatar?: string | null }, reason?: string): Promise<Webhook>;
+
+
+
+    createWebhook(options: { name: string; avatar?: string | null}, reason?: string): Promise<Webhook>;
     deleteMessage(messageID: string, reason?: string): Promise<void>;
     deleteMessages(messageIDs: string[], reason?: string): Promise<void>;
     edit(options: Omit<EditChannelOptions, "icon" | "ownerID">, reason?: string): Promise<this>;
-    editMessage(messageID: string, content: MessageContent): Promise<Message<TextChannel>>;
+    editMessage(messageID: string, content: MessageContentEdit): Promise<Message<TextChannel>>;
+    /** @deprecated */
+    getActiveThreads(): Promise<ListedChannelThreads>;
+    getArchivedThreads(type: "private", options?: GetArchivedThreadsOptions): Promise<ListedChannelThreads<PrivateThreadChannel>>;
+    getArchivedThreads(type: "public", options?: GetArchivedThreadsOptions): Promise<ListedChannelThreads<PublicThreadChannel>>;
     getInvites(): Promise<(Invite<"withMetadata", TextChannel>)[]>;
+    getJoinedPrivateArchivedThreads(options: GetArchivedThreadsOptions): Promise<ListedChannelThreads<PrivateThreadChannel>>;
     getMessage(messageID: string): Promise<Message<TextChannel>>;
     getMessageReaction(messageID: string, reaction: string, options?: GetMessageReactionOptions): Promise<User[]>;
     /** @deprecated */
@@ -3011,6 +3341,51 @@ declare namespace Eris {
     unsendMessage(messageID: string): Promise<void>;
   }
 
+  export class ThreadChannel extends GuildChannel implements ThreadTextable {
+    lastMessageID: string;
+    lastPinTimestamp?: number;
+    member?: ThreadMember;
+    memberCount: number;
+    members: Collection<ThreadMember>;
+    messageCount: number;
+    messages: Collection<Message<this>>;
+    ownerID: string;
+    rateLimitPerUser: number;
+    threadMetadata: ThreadMetadata;
+    type: 10 | 11 | 12;
+    constructor(data: BaseData, client: Client, messageLimit?: number);
+    addMessageReaction(messageID: string, reaction: string): Promise<void>;
+    createMessage(content: MessageContent, file?: FileContent | FileContent[]): Promise<Message<ThreadChannel>>;
+    deleteMessage(messageID: string, reason?: string): Promise<void>;
+    deleteMessages(messageIDs: string[], reason?: string): Promise<void>;
+    edit(options: Pick<EditChannelOptions, "archived" | "autoArchiveDuration" | "invitable" | "locked" | "name" | "rateLimitPerUser">, reason?: string): Promise<this>;
+    editMessage(messageID: string, content: MessageContentEdit): Promise<Message<ThreadChannel>>;
+    getMembers(): Promise<ThreadMember[]>;
+    getMessage(messageID: string): Promise<Message<ThreadChannel>>;
+    getMessageReaction(messageID: string, reaction: string, options?: GetMessageReactionOptions): Promise<User[]>;
+    getMessages(options?: GetMessagesOptions): Promise<Message<ThreadChannel>[]>;
+    getPins(): Promise<Message<ThreadChannel>[]>;
+    join(userID?: string): Promise<void>;
+    leave(userID?: string): Promise<void>;
+    pinMessage(messageID: string): Promise<void>;
+    purge(options: PurgeChannelOptions): Promise<number>;
+    removeMessageReaction(messageID: string, reaction: string, userID?: string): Promise<void>;
+    removeMessageReactionEmoji(messageID: string, reaction: string): Promise<void>;
+    removeMessageReactions(messageID: string): Promise<void>;
+    sendTyping(): Promise<void>;
+    unpinMessage(messageID: string): Promise<void>;
+    unsendMessage(messageID: string): Promise<void>;
+  }
+
+  export class ThreadMember extends Base {
+    client: Client;
+    joinTimestamp: number;
+    threadID: string;
+    constructor(data: BaseData, client: Client);
+    leave(): Promise<void>;
+    update(data: BaseData): void;
+  }
+
   export class UnavailableGuild extends Base {
     createdAt: number;
     id: string;
@@ -3020,8 +3395,11 @@ declare namespace Eris {
   }
 
   export class User extends Base {
+    accentColor?: number | null;
     avatar: string | null;
     avatarURL: string;
+    banner?: string | null;
+    bannerURL: string | null;
     bot: boolean;
     createdAt: number;
     defaultAvatar: string;
@@ -3037,6 +3415,7 @@ declare namespace Eris {
     addRelationship(block?: boolean): Promise<void>;
     deleteNote(): Promise<void>;
     dynamicAvatarURL(format?: ImageFormat, size?: number): string;
+    dynamicBannerURL(format?: ImageFormat, size?: number): string | null;
     editNote(note: string): Promise<void>;
     getDMChannel(): Promise<PrivateChannel>;
     getProfile(): Promise<UserProfile>;
@@ -3046,7 +3425,7 @@ declare namespace Eris {
   export class VoiceChannel extends GuildChannel implements Invitable {
     bitrate: number;
     rtcRegion: string | null;
-    type: 2 | 13;
+    type: GuildVoiceChannelTypes;
     userLimit: number;
     videoQualityMode: VideoQualityMode;
     voiceMembers: Collection<Member>;
