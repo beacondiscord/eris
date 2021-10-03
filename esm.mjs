@@ -1,52 +1,48 @@
-import Eris from './index.js';
+import mod from "./index.js";
 
-export default function (token, options) {
-  return new Eris.Client(token, options);
-}
-
-export const {
-  AutocompleteInteraction,
-  Base,
-  Bucket,
-  CategoryChannel,
-  Channel,
-  Client,
-  Collection,
-  CommandInteraction,
-  ComponentInteraction,
-  Constants,
-  DiscordHTTPError,
-  DiscordRESTError,
-  Guild,
-  GuildChannel,
-  GuildIntegration,
-  GuildPreview,
-  GuildTemplate,
-  Interaction,
-  Invite,
-  Member,
-  Message,
-  NewsChannel,
-  NewsThreadChannel,
-  Permission,
-  PermissionOverwrite,
-  PingInteraction,
-  PrivateChannel,
-  PrivateThreadChannel,
-  PublicThreadChannel,
-  RequestHandler,
-  Role,
-  SequentialBucket,
-  StageChannel,
-  StageInstance,
-  StoreChannel,
-  TextChannel,
-  ThreadChannel,
-  ThreadMember,
-  UnavailableGuild,
-  UnknownInteraction,
-  User,
-  VERSION,
-  VoiceChannel,
-  VoiceState
-} = Eris;
+export default mod;
+export const AutocompleteInteraction = mod.AutocompleteInteraction;
+export const Base = mod.Base;
+export const Bucket = mod.Bucket;
+export const CategoryChannel = mod.CategoryChannel;
+export const Channel = mod.Channel;
+export const Client = mod.Client;
+export const Collection = mod.Collection;
+export const CommandInteraction = mod.CommandInteraction;
+export const ComponentInteraction = mod.ComponentInteraction;
+export const Constants = mod.Constants;
+export const DiscordHTTPError = mod.DiscordHTTPError;
+export const DiscordRESTError = mod.DiscordRESTError;
+export const Guild = mod.Guild;
+export const GuildChannel = mod.GuildChannel;
+export const GuildIntegration = mod.GuildIntegration;
+export const GuildPreview = mod.GuildPreview;
+export const GuildTemplate = mod.GuildTemplate;
+export const Interaction = mod.Interaction;
+export const Invite = mod.Invite;
+export const Member = mod.Member;
+export const Message = mod.Message;
+export const NewsChannel = mod.NewsChannel;
+export const NewsThreadChannel = mod.NewsThreadChannel;
+export const Permission = mod.Permission;
+export const PermissionOverwrite = mod.PermissionOverwrite;
+export const PingInteraction = mod.PingInteraction;
+export const PrivateChannel = mod.PrivateChannel;
+export const PrivateThreadChannel = mod.PrivateThreadChannel;
+export const PublicThreadChannel = mod.PublicThreadChannel;
+export const RequestHandler = mod.RequestHandler;
+export const Role = mod.Role;
+export const SequentialBucket = mod.SequentialBucket;
+export const Shard = mod.Shard;
+export const StageChannel = mod.StageChannel;
+export const StageInstance = mod.StageInstance;
+export const StoreChannel = mod.StoreChannel;
+export const TextChannel = mod.TextChannel;
+export const ThreadChannel = mod.ThreadChannel;
+export const ThreadMember = mod.ThreadMember;
+export const UnavailableGuild = mod.UnavailableGuild;
+export const UnknownInteraction = mod.UnknownInteraction;
+export const User = mod.User;
+export const VERSION = mod.VERSION;
+export const VoiceChannel = mod.VoiceChannel;
+export const VoiceState = mod.VoiceState;
