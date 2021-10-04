@@ -20,6 +20,7 @@ Eris.DiscordHTTPError = require('./lib/errors/DiscordHTTPError');
 Eris.DiscordRESTError = require('./lib/errors/DiscordRESTError');
 Eris.Guild = require('./lib/structures/Guild');
 Eris.GuildChannel = require('./lib/structures/GuildChannel');
+Eris.GuildEvent = require('./lib/structures/GuildEvent');
 Eris.GuildIntegration = require('./lib/structures/GuildIntegration');
 Eris.GuildPreview = require('./lib/structures/GuildPreview');
 Eris.GuildTemplate = require('./lib/structures/GuildTemplate');

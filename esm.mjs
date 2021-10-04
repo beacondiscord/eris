@@ -15,6 +15,7 @@ export const DiscordHTTPError = mod.DiscordHTTPError;
 export const DiscordRESTError = mod.DiscordRESTError;
 export const Guild = mod.Guild;
 export const GuildChannel = mod.GuildChannel;
+export const GuildEvent = mod.GuildEvent;
 export const GuildIntegration = mod.GuildIntegration;
 export const GuildPreview = mod.GuildPreview;
 export const GuildTemplate = mod.GuildTemplate;
