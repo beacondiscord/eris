@@ -1,10 +1,7 @@
 const fs = require('fs');
 const package = require('./package.json');
-const childProc = require('child_process');
 
-const rev = childProc.execSync('git rev-parse --short HEAD').toString().trim();
-
-package.version = `0.16.0-${rev}`;
+package.version = `0.16.0-${Date.now()}`;
 
 fs.writeFileSync('./package.json', JSON.stringify(package, null, 2));
 
