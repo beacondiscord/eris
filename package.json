@@ -1,6 +1,6 @@
 {
   "name": "eris",
-  "version": "0.16.0-1633306492149",
+  "version": "0.16.0-1",
   "description": "A NodeJS Discord library",
   "main": "./index.js",
   "exports": {
@@ -16,12 +16,11 @@
   },
   "typings": "./index.d.ts",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.8.0"
   },
   "scripts": {
     "format:check": "prettier --check \"lib/**/*.js\"",
     "format:fix": "prettier --write \"lib/**/*.js\"",
-    "prepare": "husky install",
     "esm": "gen-esm-wrapper index.js esm.mjs"
   },
   "repository": {
@@ -49,7 +48,6 @@
     "@types/node": "^16.10.2",
     "@types/ws": "^8.2.0",
     "gen-esm-wrapper": "^1.1.3",
-    "husky": "^7.0.2",
     "prettier": "^2.4.1",
     "typescript": "^4.4.3"
   }
