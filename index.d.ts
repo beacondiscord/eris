@@ -3213,8 +3213,6 @@ declare namespace Eris {
     deleteMessages(messageIDs: string[], reason?: string): Promise<void>;
     edit(options: Omit<EditChannelOptions, 'icon' | 'ownerID'>, reason?: string): Promise<this>;
     editMessage(messageID: string, content: MessageContentEdit): Promise<Message<TextChannel>>;
-    /** @deprecated */
-    getActiveThreads(): Promise<ListedChannelThreads>;
     getArchivedThreads(
       type: 'private',
       options?: GetArchivedThreadsOptions
