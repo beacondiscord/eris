@@ -16,7 +16,7 @@
   },
   "typings": "./index.d.ts",
   "engines": {
-    "node": ">=16.8.0"
+    "node": ">=16.6.0"
   },
   "scripts": {
     "format:check": "prettier --check \"lib/**/*.js\"",
