@@ -777,6 +777,7 @@ declare namespace Eris {
     ];
     threadMemberUpdate: [channel: AnyThreadChannel, member: ThreadMember, oldMember: OldThreadMember];
     threadUpdate: [channel: AnyThreadChannel, oldChannel: OldThread | null];
+    shardPreReady: [id: number];
     typingStart:
       | [channel: GuildTextableChannel | Uncached, user: User | Uncached, member: Member]
       | [channel: PrivateChannel | Uncached, user: User | Uncached, member: null];
@@ -807,21 +808,6 @@ declare namespace Eris {
     end: [];
     error: [err: Error];
     start: [];
-  }
-  interface VoiceEvents {
-    connect: [];
-    debug: [message: string];
-    disconnect: [err?: Error];
-    end: [];
-    error: [err: Error];
-    ping: [latency: number];
-    ready: [];
-    speakingStart: [userID: string];
-    speakingStop: [userID: string];
-    start: [];
-    unknown: [packet: RawPacket];
-    userDisconnect: [userID: string];
-    warn: [message: string];
   }
 
   // Gateway/REST

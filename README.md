@@ -2,34 +2,51 @@
 
 Do not forward errors you encounter to me, unless you believe they were caused during merging. Point them to the pull request author, or main eris repository if you cannot figure out where they came from. We would all be happy to help in #support of the [Eris Discord Server](https://discord.gg/eris)
 
+#### Documentation
+
+You can find some documentation [here](https://eris.owo-whats-this.dev/everything).
+
 #### To Install:
+
 ```
-npm i DonovanDMC/eris#everything
+npm i beacondiscord/eris#everything
 ```
 
-#### Included Pull Requests:
-* [@catboi8](https://github.com/Catboi8) [[Support Interactions](https://github.com/abalabahaha/eris/pull/1210)]
-* [@bsian03](https://github.com/bsian03) [[Discord API V9](https://github.com/abalabahaha/eris/pull/1216)]
-* [@LJNeon](https://github.com/LJNeon) [[Standardized parsing errors](https://github.com/abalabahaha/eris/pull/1227)]
-* [@iiFDCT](https://github.com/iiFDCT) [[Add support for user banners](https://github.com/abalabahaha/eris/pull/1238)]
-* [@DonovanDMC](https://github.com/DonovanDMC) [[Sticker Sending](https://github.com/abalabahaha/eris/pull/1252)]
-* [@Catboi8](https://github.com/Catboi8) [[Tweak eslint.ts](https://github.com/abalabahaha/eris/pull/1254)]
-* [@iiFDCT](https://github.com/iiFDCT) [[Ability to manage stickers, guildStickersUpdate and Guild#stickers](https://github.com/abalabahaha/eris/pull/1258)]
+#### Pull Requests
 
-#### Previously Included (Merged Into Dev)
-* [@bsian03](https://github.com/bsian03) [[Expose components](https://github.com/abalabahaha/eris/pull/1189)]
-* [@bsian03](https://github.com/bsian03) [[Type guild features as actual values](https://github.com/abalabahaha/eris/pull/1212)]
-* [@bsian03](https://github.com/bsian03) [[Support guild specific avatars](https://github.com/abalabahaha/eris/pull/1219)]
-* [@HeadTriXz](https://github.com/HeadTriXz) [[Better types for events](https://github.com/abalabahaha/eris/pull/1242)]
-* [@bsian03](https://github.com/bsian03) [[Fix/improve handling of rate limit headers](https://github.com/abalabahaha/eris/pull/1256)]
-* [@bsian03](https://github.com/bsian03) [[Expose audit log events 83-85](https://github.com/abalabahaha/eris/pull/1213)]
-* [@bsian03](https://github.com/bsian03) [[Warn when invalid intent is supplied](https://github.com/abalabahaha/eris/pull/1261)]
-* [@iiFDCT](https://github.com/iiFDCT) [[Update permission flag names to match Discord & update guildEmojisAndStickers intent name](https://github.com/abalabahaha/eris/pull/1257)]
+<details>
+<summary>Currently Included</summary>
+<ul>
+<li><a href="https://github.com/LJNeon">@LJNeon</a> [<a href="https://github.com/abalabahaha/eris/pull/1227">Standardized parsing errors</a>]</li>
+<li><a href="https://github.com/Catboi8">@Catboi8</a> [<a href="https://github.com/abalabahaha/eris/pull/1254">Tweak eslint.ts</a>]</li>
+<li><a href="https://github.com/DonovanDMC">@DonovanDMC</a> [<a href="https://github.com/abalabahaha/eris/pull/1271">Several Constants Changes/Additions</a>]</li>
+<li><a href="https://github.com/Loliticos">@Loliticos</a> [<a href="https://github.com/abalabahaha/eris/pull/1275">Guild Scheduled Events</a>]</li>
+<li><a href="https://github.com/eritbh">@eritbh</a> [<a href="https://github.com/abalabahaha/eris/pull/1276">Use process warnings for deprecations</a>]</li>
+<li><a href="https://github.com/DonovanDMC">@DonovanDMC</a> [<a href="https://github.com/abalabahaha/eris/pull/1277">make id optional for some events</a>]</li>
+<li><a href="https://github.com/iiFDCT">@iiFDCT</a> [<a href="https://github.com/abalabahaha/eris/pull/1278">Role icon support</a>]</li>
+<li><a href="https://github.com/bsian03">@bsian03</a> [<a href="https://github.com/abalabahaha/eris/pull/1279">Discord API V9</a>]</li>
+<li><a href="https://github.com/Catboi8">@Catboi8</a> [<a href="https://github.com/abalabahaha/eris/pull/1280">Support Interactions</a>]</li>
+</ul>
+</details>
+
+<details>
+<summary>Previously Included</summary>
+<ul>
+<li>(Merged) <a href="https://github.com/bsian03">@bsian03</a> [<a href="https://github.com/abalabahaha/eris/pull/1189">Expose components</a>]</li>
+<li>(Merged) <a href="https://github.com/bsian03">@bsian03</a> [<a href="https://github.com/abalabahaha/eris/pull/1212">Type guild features as actual values</a>]</li>
+<li>(Merged) <a href="https://github.com/bsian03">@bsian03</a> [<a href="https://github.com/abalabahaha/eris/pull/1213">Expose audit log events 83-85</a>]</li>
+<li>(Merged) <a href="https://github.com/bsian03">@bsian03</a> [<a href="https://github.com/abalabahaha/eris/pull/1219">Support guild specific avatars</a>]</li>
+<li>(Merged) <a href="https://github.com/iiFDCT">@iiFDCT</a> [<a href="https://github.com/abalabahaha/eris/pull/1238">Add support for user banners</a>]</li>
+<li>(Merged) <a href="https://github.com/HeadTriXz">@HeadTriXz</a> [<a href="https://github.com/abalabahaha/eris/pull/1242">Better types for events</a>]</li>
+<li>(Merged) <a href="https://github.com/DonovanDMC">@DonovanDMC</a> [<a href="https://github.com/abalabahaha/eris/pull/1252">Sticker Sending</a>]</li>
+<li>(Merged) <a href="https://github.com/bsian03">@bsian03</a> [<a href="https://github.com/abalabahaha/eris/pull/1256">Fix/improve handling of rate limit headers</a>]</li>
+<li>(Merged) <a href="https://github.com/iiFDCT">@iiFDCT</a> [<a href="https://github.com/abalabahaha/eris/pull/1257">Update permission flag names to match Discord &amp; update guildEmojisAndStickers intent name</a>]</li>
+<li>(Merged) <a href="https://github.com/iiFDCT">@iiFDCT</a> [<a href="https://github.com/abalabahaha/eris/pull/1258">Ability to manage stickers, guildStickersUpdate and Guild#stickers</a>]</li>
+<li>(Merged) <a href="https://github.com/bsian03">@bsian03</a> [<a href="https://github.com/abalabahaha/eris/pull/1261">Warn when invalid intent is supplied</a>]</li>
+</ul>
+</details>
 
 #### Table of Contents
-(striked branches are obsolete, and may no longer exist)
-* **everything**
-* [v9-interactions](https://github.com/DonovanDMC/eris/tree/v9-interactions)
-* ~~v9-components~~
-* ~~components-interactions~~
-* ~~v9-components-interactions~~
+
+- **everything**
+- [v9-interactions](https://github.com/DonovanDMC/eris/tree/v9-interactions)
