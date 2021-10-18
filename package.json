@@ -42,7 +42,6 @@
   "homepage": "https://abal.moe/Eris/",
   "dependencies": {
     "@tbnritzdoge/events": "^1.0.5",
-    "form-data": "^4.0.0",
     "ws": "^8.2.3"
   },
   "devDependencies": {
