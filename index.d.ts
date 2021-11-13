@@ -72,6 +72,7 @@ declare namespace Eris {
   type InteractionType = Constants['ApplicationCommandTypes'][keyof Constants['ApplicationCommandTypes']];
 
   // Interaction
+  type AnyInteraction = PingInteraction | CommandInteraction | ComponentInteraction | AutocompleteInteraction;
   type InteractionDataOptions =
     | InteractionDataOptionsSubCommand
     | InteractionDataOptionsSubCommandGroup
@@ -108,6 +109,7 @@ declare namespace Eris {
     name: string;
     type: T;
     value: V;
+    focused?: boolean;
   }
   type InteractionDataOptionsString = InteractionDataOptionWithValue<
     Constants['ApplicationCommandOptionTypes']['STRING'],
@@ -170,14 +172,12 @@ declare namespace Eris {
     type: Constants['ApplicationCommandOptionTypes']['SUB_COMMAND'];
     name: string;
     description: string;
-    required?: boolean;
     options?: ApplicationCommandOptionsWithValue[];
   }
   interface ApplicationCommandOptionsSubCommandGroup {
     type: Constants['ApplicationCommandOptionTypes']['SUB_COMMAND_GROUP'];
     name: string;
     description: string;
-    required?: boolean;
     options?: (ApplicationCommandOptionsSubCommand | ApplicationCommandOptionsWithValue)[];
   }
   interface ApplicationCommandOptionChoice<
@@ -213,6 +213,26 @@ declare namespace Eris {
     choices?: ApplicationCommandOptionChoice<T>[];
     autocomplete?: boolean;
   }
+
+  interface ApplicationCommandOptionWithMinMax<
+    T extends Constants['ApplicationCommandOptionTypes'][keyof Pick<
+      Constants['ApplicationCommandOptionTypes'],
+      'INTEGER' | 'NUMBER'
+    >] = Constants['ApplicationCommandOptionTypes'][keyof Pick<
+      Constants['ApplicationCommandOptionTypes'],
+      'INTEGER' | 'NUMBER'
+    >]
+  > {
+    type: T;
+    name: string;
+    description: string;
+    required?: boolean;
+    choices?: ApplicationCommandOptionChoice<T>[];
+    autocomplete?: boolean;
+    min_value?: number;
+    max_value?: number;
+  }
+
   interface ApplicationCommandOption<
     T extends Constants['ApplicationCommandOptionTypes'][Exclude<
       keyof Constants['ApplicationCommandOptionTypes'],
@@ -240,15 +260,27 @@ declare namespace Eris {
   // Integer
   type ApplicationCommandOptionsInteger =
     | ApplicationCommandOptionsIntegerWithAutocomplete
-    | ApplicationCommandOptionsIntegerWithoutAutocomplete;
+    | ApplicationCommandOptionsIntegerWithoutAutocomplete
+    | ApplicationCommandOptionsIntegerWithMinMax;
   type ApplicationCommandOptionsIntegerWithAutocomplete = Omit<
     ApplicationCommandOptionWithChoices<Constants['ApplicationCommandOptionTypes']['INTEGER']>,
-    'choices'
-  > & { autocomplete: true };
+    'choices' | 'min_value' | 'max_value'
+  >;
   type ApplicationCommandOptionsIntegerWithoutAutocomplete = Omit<
     ApplicationCommandOptionWithChoices<Constants['ApplicationCommandOptionTypes']['INTEGER']>,
-    'autocomplete'
-  > & { autocomplete?: false };
+    'autocomplete' | 'min_value' | 'max_value'
+  > & {
+    autocomplete?: false;
+    min_value?: null;
+    max_value?: null;
+  };
+  type ApplicationCommandOptionsIntegerWithMinMax = Omit<
+    ApplicationCommandOptionWithChoices<Constants['ApplicationCommandOptionTypes']['INTEGER']>,
+    'choices' | 'autocomplete'
+  > & {
+    autocomplete?: false;
+    choices?: null;
+  };
   // Boolean
   type ApplicationCommandOptionsBoolean = ApplicationCommandOption<
     Constants['ApplicationCommandOptionTypes']['BOOLEAN']
@@ -268,15 +300,27 @@ declare namespace Eris {
   // Number
   type ApplicationCommandOptionsNumber =
     | ApplicationCommandOptionsNumberWithAutocomplete
-    | ApplicationCommandOptionsNumberWithoutAutocomplete;
+    | ApplicationCommandOptionsNumberWithoutAutocomplete
+    | ApplicationCommandOptionsNumberWithMinMax;
   type ApplicationCommandOptionsNumberWithAutocomplete = Omit<
     ApplicationCommandOptionWithChoices<Constants['ApplicationCommandOptionTypes']['NUMBER']>,
-    'choices'
-  > & { autocomplete: true };
+    'choices' | 'min_value' | 'max_value'
+  >;
   type ApplicationCommandOptionsNumberWithoutAutocomplete = Omit<
     ApplicationCommandOptionWithChoices<Constants['ApplicationCommandOptionTypes']['NUMBER']>,
-    'autocomplete'
-  > & { autocomplete?: false };
+    'autocomplete' | 'min_value' | 'max_value'
+  > & {
+    autocomplete?: false;
+    min_value?: null;
+    max_value?: null;
+  };
+  type ApplicationCommandOptionsNumberWithMinMax = Omit<
+    ApplicationCommandOptionWithChoices<Constants['ApplicationCommandOptionTypes']['NUMBER']>,
+    'choices' | 'autocomplete'
+  > & {
+    autocomplete?: false;
+    choices?: null;
+  };
 
   interface ApplicationCommand<
     T extends Constants['ApplicationCommandTypes'][keyof Constants['ApplicationCommandTypes']] = Constants['ApplicationCommandTypes'][keyof Constants['ApplicationCommandTypes']]
@@ -717,9 +761,9 @@ declare namespace Eris {
     channelPinUpdate: [channel: TextableChannel, timestamp: number, oldTimestamp: number];
     channelUpdate: [channel: AnyGuildChannel, oldChannel: OldGuildChannel | OldGuildTextChannel | OldGuildVoiceChannel];
     connect: [id: number];
-    debug: [message: string, id: number];
+    debug: [message: string, id?: number];
     disconnect: [];
-    error: [err: Error, id: number];
+    error: [err: Error, id?: number];
     guildAvailable: [guild: Guild];
     guildBanAdd: [guild: Guild, user: User];
     guildBanRemove: [guild: Guild, user: User];
@@ -782,13 +826,13 @@ declare namespace Eris {
       | [channel: GuildTextableChannel | Uncached, user: User | Uncached, member: Member]
       | [channel: PrivateChannel | Uncached, user: User | Uncached, member: null];
     unavailableGuildCreate: [guild: UnavailableGuild];
-    unknown: [packet: RawPacket, id: number];
+    unknown: [packet: RawPacket, id?: number];
     userUpdate: [user: User, oldUser: PartialUser | null];
     voiceChannelJoin: [member: Member, channel: AnyVoiceChannel];
     voiceChannelLeave: [member: Member, channel: AnyVoiceChannel];
     voiceChannelSwitch: [member: Member, newChannel: AnyVoiceChannel, oldChannel: AnyVoiceChannel];
     voiceStateUpdate: [member: Member, oldState: OldVoiceState];
-    warn: [message: string, id: number];
+    warn: [message: string, id?: number];
     webhooksUpdate: [data: WebhookData];
     guildScheduledEventCreate: [event: GuildEvent];
     guildScheduledEventUpdate: [event: GuildEvent, oldEvent: GuildEventOptions | null];
@@ -1754,6 +1798,7 @@ declare namespace Eris {
       SUPPRESS_JOIN_NOTIFICATIONS: 1;
       SUPPRESS_PREMIUM_SUBSCRIPTIONS: 2;
       SUPPRESS_GUILD_REMINDER_NOTIFICATIONS: 4;
+      SUPPRESS_JOIN_NOTIFICATION_REPLIES: 8;
     };
     SystemJoinMessages: [
       '%user% joined the party.',
@@ -2344,7 +2389,7 @@ declare namespace Eris {
     joinedAt: number;
     large: boolean;
     maxMembers: number;
-    maxPresences: number;
+    maxPresences?: number | null;
     maxVideoChannelUsers?: number;
     memberCount: number;
     members: Collection<Member>;
@@ -2355,6 +2400,7 @@ declare namespace Eris {
     nsfwLevel: NSFWLevel;
     ownerID: string;
     preferredLocale: string;
+    premiumProgressBarEnabled: boolean;
     premiumSubscriptionCount?: number;
     premiumTier: PremiumTier;
     primaryCategory?: DiscoveryCategory;
@@ -3095,7 +3141,7 @@ declare namespace Eris {
     requestMembersPromise: { [s: string]: RequestMembersPromise };
     seq: number;
     sessionID: string | null;
-    status: 'disconnected' | 'connecting' | 'handshaking' | 'ready' | 'resuming';
+    status: 'connecting' | 'disconnected' | 'handshaking' | 'identifying' | 'ready' | 'resuming';
     unsyncedGuilds: number;
     ws: WebSocket | null;
     constructor(id: number, client: Client);
