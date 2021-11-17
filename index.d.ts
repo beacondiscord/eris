@@ -1283,7 +1283,7 @@ declare namespace Eris {
   }
 
   // Presence
-  interface Activity extends ActivityPartial<ActivityType> {
+  interface Activity<T extends ActivityType = ActivityType> extends ActivityPartial<T> {
     application_id?: string;
     assets?: {
       large_image?: string;
@@ -1301,12 +1301,13 @@ declare namespace Eris {
     secrets?: { join?: string; spectate?: string; match?: string };
     state?: string;
     timestamps?: { end?: number; start: number };
+    type: T;
     // the stuff attached to this object apparently varies even more than documented, so...
     [key: string]: unknown;
   }
   interface ActivityPartial<T extends ActivityType = BotActivityType> {
     name: string;
-    type: T;
+    type?: T;
     url?: string;
   }
   interface ClientPresence {
@@ -2703,6 +2704,7 @@ declare namespace Eris {
     token: string;
     type: number;
     version: number;
+    static from(data: BaseData): AnyInteraction;
   }
 
   export class PingInteraction extends Interaction {
